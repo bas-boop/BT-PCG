@@ -7,47 +7,48 @@ using Framework.Extensions;
 
 namespace Framework.TriggerArea
 {
-    [RequireComponent(typeof(BoxCollider))]
-    [RequireComponent(typeof(SphereCollider))]
-    [RequireComponent(typeof(CapsuleCollider))]
-    [RequireComponent(typeof(MeshFilter))]
-    public sealed class TriggerArea : MonoBehaviour
+    [RequireComponent(typeof(BoxCollider2D))]
+    [RequireComponent(typeof(CircleCollider2D))]
+    [RequireComponent(typeof(CapsuleCollider2D))]
+    [RequireComponent(typeof(SpriteRenderer))]
+    public sealed class TriggerArea2D : MonoBehaviour
     {
-        private const string FBX_SUFFIX = ".fbx";
+        private const string PNG_SUFFIX = ".png";
+        private const string SPRITE_PATH = "Packages/com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/v2/";
         
-        [SerializeField] private StandardMeshes shapeToUse;
+        [SerializeField] private StandardSprites shapeToUse;
         [SerializeField, Tag] private string tagToTriggerWith = "Player";
         [SerializeField] private TriggerBehaviour behaviour;
         [SerializeField] private bool isOneTimeUse;
         
         [Space(20)]
-        [SerializeField] private UnityEvent onEnter = new();
-        [SerializeField] private UnityEvent onExit = new();
+        [SerializeField] private UnityEvent<GameObject> onEnter = new();
+        [SerializeField] private UnityEvent<GameObject> onExit = new();
 
-        private MeshFilter _meshFilter;
-        private BoxCollider _boxCollider;
-        private SphereCollider _sphereCollider;
-        private CapsuleCollider _capsuleCollider;
+        private SpriteRenderer _spriteRenderer;
+        private BoxCollider2D _boxCollider;
+        private CircleCollider2D _sphereCollider;
+        private CapsuleCollider2D _capsuleCollider;
 
         private bool _isTriggered;
 
         private void Awake()
         {
-            _boxCollider = GetComponent<BoxCollider>();
-            _sphereCollider = GetComponent<SphereCollider>();
-            _capsuleCollider = GetComponent<CapsuleCollider>();
+            _boxCollider = GetComponent<BoxCollider2D>();
+            _sphereCollider = GetComponent<CircleCollider2D>();
+            _capsuleCollider = GetComponent<CapsuleCollider2D>();
 
             _boxCollider.isTrigger = true;
             _sphereCollider.isTrigger = true;
             _capsuleCollider.isTrigger = true;
             
-            if (!_meshFilter)
-                _meshFilter = GetComponent<MeshFilter>();
+            if (!_spriteRenderer)
+                _spriteRenderer = GetComponent<SpriteRenderer>();
 
-            _meshFilter.mesh = null;
+            _spriteRenderer.sprite = null;
         }
 
-        private void OnTriggerEnter(Collider other)
+        private void OnTriggerEnter2D(Collider2D other)
         {
             if (behaviour == TriggerBehaviour.EXIT_ONLY
                 || CheckOneTimeUse()
@@ -55,10 +56,10 @@ namespace Framework.TriggerArea
                 return;
 
             _isTriggered = true;
-            onEnter?.Invoke();
+            onEnter?.Invoke(other.gameObject);
         }
 
-        private void OnTriggerExit(Collider other)
+        private void OnTriggerExit2D(Collider2D other)
         {
             if (behaviour == TriggerBehaviour.ENTER_ONLY
                 || CheckOneTimeUse()
@@ -66,9 +67,9 @@ namespace Framework.TriggerArea
                 return;
             
             _isTriggered = true;
-            onExit?.Invoke();
+            onExit?.Invoke(other.gameObject);
         }
-
+        
         public void TestTrigger() => Debug.Log(shapeToUse);
 
 #if UNITY_EDITOR
@@ -76,28 +77,35 @@ namespace Framework.TriggerArea
 
         private void UpdateMesh()
         {
-            _meshFilter = GetComponent<MeshFilter>();
-            _meshFilter.mesh = Resources.GetBuiltinResource<Mesh>(shapeToUse.GetStringValue() + FBX_SUFFIX);
+            string spriteName = shapeToUse.GetStringValue(); // e.g. "Circle"
+            Sprite sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(
+                SPRITE_PATH + spriteName + PNG_SUFFIX
+            );
 
-            _boxCollider = GetComponent<BoxCollider>();
-            _sphereCollider = GetComponent<SphereCollider>();
-            _capsuleCollider = GetComponent<CapsuleCollider>();
+            if (sprite != null)
+                _spriteRenderer.sprite = sprite;
+            else
+                Debug.LogWarning($"[TriggerArea] Sprite not found: {spriteName}");
+
+            _boxCollider = GetComponent<BoxCollider2D>();
+            _sphereCollider = GetComponent<CircleCollider2D>();
+            _capsuleCollider = GetComponent<CapsuleCollider2D>();
             
             switch (shapeToUse)
             {
-                case StandardMeshes.CUBE:
+                case StandardSprites.BOX:
                     _boxCollider.enabled = true;
                     _sphereCollider.enabled = false;
                     _capsuleCollider.enabled = false;
                     break;
                 
-                case StandardMeshes.SPHERE:
+                case StandardSprites.CIRCLE:
                     _boxCollider.enabled = false;
                     _sphereCollider.enabled = true;
                     _capsuleCollider.enabled = false;
                     break;
                 
-                case StandardMeshes.CAPSULE:
+                case StandardSprites.CAPSULE:
                     _boxCollider.enabled = false;
                     _sphereCollider.enabled = false;
                     _capsuleCollider.enabled = true;

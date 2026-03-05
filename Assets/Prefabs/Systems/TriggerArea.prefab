@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2222225989089193649}
   - component: {fileID: 1278331672192266014}
   - component: {fileID: 2571547068591907405}
-  - component: {fileID: 6305424753677059542}
+  - component: {fileID: 2264816847286999318}
   m_Layer: 0
   m_Name: TriggerArea
   m_TagString: Untagged
@@ -109,7 +109,7 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6340779541225869551}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &6305424753677059542
+--- !u!114 &2264816847286999318
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -118,7 +118,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6340779541225869551}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3078e7e66eee472f9c3688d94cc9edd8, type: 3}
+  m_Script: {fileID: 11500000, guid: 45c5a5df6feb479dbd7f3de3e7250a5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Framework.TriggerArea.TriggerArea
   shapeToUse: 0
