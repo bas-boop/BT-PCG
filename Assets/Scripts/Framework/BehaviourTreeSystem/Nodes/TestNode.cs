@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Framework.BehaviourTreeSystem
+namespace Framework.BehaviourTreeSystem.Nodes
 {
     public sealed class TestNode : Node
     {

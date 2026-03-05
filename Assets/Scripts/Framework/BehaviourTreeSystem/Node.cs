@@ -3,6 +3,7 @@
     public abstract class Node
     {
         protected DictWrapper p_dictWrapper;
+        protected NodeStatus p_status;
      
         private bool _hasEntered;
 
@@ -16,20 +17,24 @@
                 _hasEntered = true;
             }
 
-            NodeStatus result = OnUpdate();
+            p_status = OnUpdate();
 
-            if (result == NodeStatus.RUNNING)
-                return result;
+            if (p_status == NodeStatus.RUNNING)
+                return p_status;
             
             OnExit();
             _hasEntered = false;
-            return result;
+            return p_status;
         }
 
         public virtual void SetDictWrapper(DictWrapper dictWrapper) => p_dictWrapper = dictWrapper;
 
+        public NodeStatus GetStatus() => p_status;
+
         protected abstract NodeStatus OnUpdate();
+        
         protected virtual void OnEnter() { }
+        
         protected virtual void OnExit() { }
     }
 }

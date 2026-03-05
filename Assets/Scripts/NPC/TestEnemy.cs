@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
 using Framework.BehaviourTreeSystem;
+using Framework.BehaviourTreeSystem.Nodes;
 
 namespace NPC
 {
@@ -16,7 +17,8 @@ namespace NPC
 
             _tree = new SequenceNode(
                 new TestNode("1"),
-                new TestNode("2"),
+                new WaitNode(2),
+                new InvertNode(new TestNode("2")),
                 new TestNode("3")
             );
             

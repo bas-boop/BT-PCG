@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Framework.BehaviourTreeSystem
+namespace Framework.BehaviourTreeSystem.Nodes
 {
     public class SequenceNode : Node
     {

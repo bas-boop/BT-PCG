@@ -1,0 +1,33 @@
+﻿using UnityEngine;
+
+namespace Framework.BehaviourTreeSystem.Nodes
+{
+    public sealed class InvertNode : Node
+    {
+        private Node _nodeToInvert;
+        private NodeStatus _otherNodeStatus;
+        
+        public InvertNode(Node nodeToInvert)
+        {
+            _nodeToInvert = nodeToInvert;
+            _otherNodeStatus = _nodeToInvert.GetStatus();
+        }
+
+        protected override NodeStatus OnUpdate()
+        {
+            _nodeToInvert.Update();
+            _otherNodeStatus = _nodeToInvert.GetStatus();
+            
+            var a= _otherNodeStatus switch
+            {
+                NodeStatus.SUCCES => NodeStatus.FAILED,
+                NodeStatus.FAILED => NodeStatus.SUCCES,
+                _ => NodeStatus.RUNNING
+            };
+
+            Debug.Log(a);
+            
+            return a;
+        }
+    }
+}
