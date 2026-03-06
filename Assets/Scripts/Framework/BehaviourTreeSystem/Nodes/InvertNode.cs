@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Framework.BehaviourTreeSystem.Nodes
+﻿namespace Framework.BehaviourTreeSystem.Nodes
 {
     public sealed class InvertNode : Node
     {
@@ -18,16 +16,12 @@ namespace Framework.BehaviourTreeSystem.Nodes
             _nodeToInvert.Update();
             _otherNodeStatus = _nodeToInvert.GetStatus();
             
-            var a= _otherNodeStatus switch
+            return _otherNodeStatus switch
             {
                 NodeStatus.SUCCES => NodeStatus.FAILED,
                 NodeStatus.FAILED => NodeStatus.SUCCES,
                 _ => NodeStatus.RUNNING
             };
-
-            Debug.Log(a);
-            
-            return a;
         }
     }
 }

@@ -17,9 +17,27 @@ namespace NPC
 
             _tree = new SequenceNode(
                 new TestNode("1"),
-                new WaitNode(2),
-                new InvertNode(new TestNode("2")),
-                new TestNode("3")
+                new ParallelNode(
+                    new TestNode2("2"),
+                    new TestNode("3"),
+                    new ConditionalNode(
+                        false,
+                        new TestNode("condition")
+                    ),
+                    new SequenceNode(
+                        new WaitNode(2),
+                        new TestNode("wait done")
+                    ),
+                    new WaitNode(1),
+                    new TestNode2("4"),
+                    new SelectorNode(
+                        new TestNode2("a"),
+                        new TestNode("b"),
+                        new TestNode2("c")
+                    )
+                ),
+                new InvertNode(new TestNode("5")),
+                new TestNode("6")
             );
             
             _tree.SetDictWrapper(dictWrapper);
