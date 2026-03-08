@@ -33,5 +33,15 @@ namespace Framework.BehaviourTreeSystem.Nodes
 
             return NodeStatus.RUNNING;
         }
+        
+        protected override void OnEnter()
+        {
+            base.OnEnter();
+            
+            foreach (Node node in _nodes)
+            {
+                node.SetDictWrapper(p_dictWrapper);
+            }
+        }
     }
 }

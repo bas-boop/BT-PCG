@@ -15,5 +15,11 @@
         {
             return _condition ? _node.Update() : NodeStatus.SUCCES;
         }
+        
+        protected override void OnEnter()
+        {
+            base.OnEnter();
+            _node.SetDictWrapper(p_dictWrapper);
+        }
     }
 }

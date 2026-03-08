@@ -20,5 +20,15 @@ namespace Framework.BehaviourTreeSystem.Nodes
 
             return _nodes.Any(node => node.GetStatus() != NodeStatus.RUNNING) ? NodeStatus.SUCCES : NodeStatus.RUNNING;
         }
+        
+        protected override void OnEnter()
+        {
+            base.OnEnter();
+            
+            foreach (Node node in _nodes)
+            {
+                node.SetDictWrapper(p_dictWrapper);
+            }
+        }
     }
 }

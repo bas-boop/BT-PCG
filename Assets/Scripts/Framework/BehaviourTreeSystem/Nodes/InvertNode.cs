@@ -23,5 +23,11 @@
                 _ => NodeStatus.RUNNING
             };
         }
+
+        protected override void OnEnter()
+        {
+            base.OnEnter();
+            _nodeToInvert.SetDictWrapper(p_dictWrapper);
+        }
     }
 }

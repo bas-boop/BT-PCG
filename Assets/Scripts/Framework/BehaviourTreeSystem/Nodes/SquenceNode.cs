@@ -30,5 +30,15 @@ namespace Framework.BehaviourTreeSystem.Nodes
             _i = 0;
             return NodeStatus.SUCCES;
         }
+
+        protected override void OnEnter()
+        {
+            base.OnEnter();
+            
+            foreach (Node node in _nodes)
+            {
+                node.SetDictWrapper(p_dictWrapper);
+            }
+        }
     }
 }

@@ -369,6 +369,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6891ac613d644926b3a003adfc5d00f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC.TestEnemy
+  a: 6541
 --- !u!4 &1571112416
 Transform:
   m_ObjectHideFlags: 0

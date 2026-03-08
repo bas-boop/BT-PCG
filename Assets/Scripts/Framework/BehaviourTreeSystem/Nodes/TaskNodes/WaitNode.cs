@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Framework.BehaviourTreeSystem.Nodes
+namespace Framework.BehaviourTreeSystem.Nodes.TaskNodes
 {
     public class WaitNode : Node
     {

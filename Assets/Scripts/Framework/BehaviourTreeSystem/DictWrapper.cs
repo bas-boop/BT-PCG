@@ -12,6 +12,7 @@ namespace Framework.BehaviourTreeSystem
             if (_data.TryGetValue(key, out object value))
                 return (T)value;
             
+            Debug.LogWarning($"Default value has been returned, could not find {key}.");
             return default;
         }
 

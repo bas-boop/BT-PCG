@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 
-namespace Framework.BehaviourTreeSystem.Nodes
+namespace Framework.BehaviourTreeSystem.Nodes.TaskNodes
 {
-    public sealed class TestNode : Node
+    public sealed class TestNode2 : Node
     {
         private string test;
         
-        public TestNode(string test)
+        public TestNode2(string test)
         {
             this.test = test;
         }
@@ -14,7 +14,7 @@ namespace Framework.BehaviourTreeSystem.Nodes
         protected override NodeStatus OnUpdate()
         {
             Debug.Log(test);
-            return NodeStatus.SUCCES;
+            return NodeStatus.FAILED;
         }
     }
 }

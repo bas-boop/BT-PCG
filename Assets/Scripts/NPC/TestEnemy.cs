@@ -2,18 +2,19 @@
 
 using Framework.BehaviourTreeSystem;
 using Framework.BehaviourTreeSystem.Nodes;
+using Framework.BehaviourTreeSystem.Nodes.TaskNodes;
 
 namespace NPC
 {
     public sealed class TestEnemy : MonoBehaviour
     {
+        [SerializeField] private float a;
         private Node _tree;
         
         private void Start()
         {
             DictWrapper dictWrapper = new();
-            //float a = 1;
-            //dictWrapper.Set("", a);
+            dictWrapper.Set("A", a);
 
             _tree = new SequenceNode(
                 new TestNode("1"),
@@ -25,6 +26,8 @@ namespace NPC
                         new TestNode("condition")
                     ),
                     new SequenceNode(
+                        new YesNode(),
+                new NoNode(),
                         new WaitNode(2),
                         new TestNode("wait done")
                     ),
