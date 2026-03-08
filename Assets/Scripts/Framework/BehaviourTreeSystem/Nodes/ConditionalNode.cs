@@ -10,6 +10,8 @@
             _condition = condition;
             _node = node;
         }
+
+        public void UpdateCondition(bool newCondition) => _condition = newCondition;
         
         protected override NodeStatus OnUpdate()
         {
