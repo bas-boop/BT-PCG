@@ -77,13 +77,16 @@ namespace Framework.TriggerArea
 
         private void UpdateMesh()
         {
-            string spriteName = shapeToUse.GetStringValue(); // e.g. "Circle"
+            string spriteName = shapeToUse.GetStringValue();
             Sprite sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(
                 SPRITE_PATH + spriteName + PNG_SUFFIX
             );
 
             if (sprite != null)
+            {
+                _spriteRenderer = GetComponent<SpriteRenderer>();
                 _spriteRenderer.sprite = sprite;
+            }
             else
                 Debug.LogWarning($"[TriggerArea] Sprite not found: {spriteName}");
 
