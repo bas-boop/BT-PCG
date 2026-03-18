@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 using Framework.BehaviourTreeSystem;
 using Framework.BehaviourTreeSystem.Nodes;
@@ -9,6 +10,7 @@ namespace NPC
     public sealed class GuardEnemy : MonoBehaviour
     {
         [SerializeField] private GameObject player;
+        [SerializeField] private GameObject[] waypoints;
         
         [SerializeField] private float speed = 1;
         [SerializeField] private bool see;
@@ -46,9 +48,13 @@ namespace NPC
                 new MoveNode(gameObject, "playerPosition", speed),
                 new ConditionalNode("isInRange", new LogNode("Make an attack node"), true)
             );
-
-            // todo: fix patrol
-            _patrol = new SequenceNode();
+            
+            List<MoveNode> positions = new ();
+            
+            foreach (GameObject waypoint in waypoints)
+                positions.Add(new (gameObject, waypoint.transform.position, speed));
+            
+            _patrolTree = new SequenceNode(positions.ToArray());
             
             _tree = new SelectorNode(
                 _attackTree,
