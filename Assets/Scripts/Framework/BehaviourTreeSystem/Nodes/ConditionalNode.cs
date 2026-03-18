@@ -1,8 +1,11 @@
-﻿namespace Framework.BehaviourTreeSystem.Nodes
+﻿using UnityEngine;
+
+namespace Framework.BehaviourTreeSystem.Nodes
 {
     public class ConditionalNode : Node
     {
         private bool _condition;
+        private bool _inverted;
         private string _conditionName = string.Empty;
         private string[] _conditionNames;
         private Node _node;
@@ -19,7 +22,14 @@
             _node = node;
         }
         
-        public ConditionalNode(string[] conditionNameName, Node node)
+        public ConditionalNode(string conditionName, Node node, bool inverted)
+        {
+            _conditionName = conditionName;
+            _node = node;
+            _inverted = inverted;
+        }
+        
+        public ConditionalNode(Node node, params string[] conditionNameName)
         {
             _conditionNames = conditionNameName;
             _node = node;
@@ -30,7 +40,7 @@
             _conditionName = conditionName;
         }
         
-        public ConditionalNode(string[] conditionNameName)
+        public ConditionalNode(params string[] conditionNameName)
         {
             _conditionNames = conditionNameName;
         }
@@ -56,8 +66,15 @@
             }
 
             if (_node != null)
-                // todo: this was the wrong way around, check the tree, perhaps remake
+            {
+                if (_inverted)
+                    return _condition ? _node.Update() : NodeStatus.SUCCES;
+                
                 return _condition ? NodeStatus.SUCCES : _node.Update();
+            }
+            
+            if (_inverted)
+                return _condition ? NodeStatus.FAILED : NodeStatus.SUCCES;
             
             return _condition ? NodeStatus.SUCCES : NodeStatus.FAILED;
         }

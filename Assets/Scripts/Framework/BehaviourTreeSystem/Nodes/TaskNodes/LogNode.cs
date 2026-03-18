@@ -4,16 +4,13 @@ namespace Framework.BehaviourTreeSystem.Nodes.TaskNodes
 {
     public sealed class LogNode : Node
     {
-        private readonly string _test;
+        private readonly string _message;
         
-        public LogNode(string test)
-        {
-            _test = test;
-        }
-        
+        public LogNode(string message) => _message = message;
+
         protected override NodeStatus OnUpdate()
         {
-            Debug.Log(_test);
+            Debug.Log(_message);
             return NodeStatus.SUCCES;
         }
     }
