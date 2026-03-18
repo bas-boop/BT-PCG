@@ -10,14 +10,13 @@ namespace NPC
     {
         [SerializeField] private float speed = 1;
         [SerializeField] private bool see;
-        [SerializeField] private bool weapon;
         [SerializeField] private bool range;
         
         private Node _tree;
         private Node _patrol;
         private Node _attack;
 
-        DictWrapper dictWrapper = new ();
+        private readonly DictWrapper _dictWrapper = new ();
         
         private bool _canSeePlayer;
         private bool _hasWeapon;
@@ -25,18 +24,25 @@ namespace NPC
 
         private void Start()
         {
-            Node screachWeapon = new TestNode("");
+            Node screachWeapon = new LogNode("");
             Vector2 playerPos = Vector2.zero;
 
-            dictWrapper.Set("canSeePlayer", false);
-            dictWrapper.Set("hasWeapon", false);
-            dictWrapper.Set("isInRange", false);
+            _dictWrapper.Set("canSeePlayer", false);
+            _dictWrapper.Set("hasWeapon", false);
+            _dictWrapper.Set("isInRange", false);
             
             // todo: make it work, this is only structure
-            _attack = new SelectorNode(
-                new InvertNode(new ConditionalNode("canSeePlayer", new ConditionalNode("hasWeapon", screachWeapon))),
-                new InvertNode(new ConditionalNode("isInRange", new MoveNode(gameObject, playerPos, speed))),
-                new TestNode("Make an attack node")
+            _attack = new SequenceNode(
+                new ConditionalNode(new []{"canSeePlayer", "hasWeapon"}, new SequenceNode(
+                    new ConditionalNode("canSeePlayer"),
+                    new InvertNode(new ConditionalNode("hasWeapon")),
+                    new WaitNode(1),
+                    new FunctionNode(Search)
+                    )
+                ),
+                //new LogNode("walk to player"),
+                new ConditionalNode("isInRange", new MoveNode(gameObject, playerPos, speed)),
+                new LogNode("Make an attack node")
             );
 
             // todo: fix patrol
@@ -47,17 +53,26 @@ namespace NPC
                 _patrol
             );
             
-            _tree.SetDictWrapper(dictWrapper);
+            _tree.SetDictWrapper(_dictWrapper);
         }
 
         private void Update()
         {
             // todo: update all bools
-            dictWrapper.Set("canSeePlayer", see);
-            dictWrapper.Set("hasWeapon", weapon);
-            dictWrapper.Set("isInRange", range);
+            _dictWrapper.Set("canSeePlayer", see);
+            _dictWrapper.Set("isInRange", range);
             
             _tree.Update();
+
+            // to see in inspector
+            _canSeePlayer = _dictWrapper.Get<bool>("canSeePlayer");
+            _hasWeapon = _dictWrapper.Get<bool>("hasWeapon");
+            _isInRange = _dictWrapper.Get<bool>("isInRange");
+        }
+
+        private void Search()
+        {
+            _dictWrapper.Set("hasWeapon", true);
         }
     }
 }

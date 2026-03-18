@@ -2,18 +2,18 @@
 
 namespace Framework.BehaviourTreeSystem.Nodes.TaskNodes
 {
-    public sealed class TestNode : Node
+    public sealed class LogNode : Node
     {
-        private string test;
+        private readonly string _test;
         
-        public TestNode(string test)
+        public LogNode(string test)
         {
-            this.test = test;
+            _test = test;
         }
         
         protected override NodeStatus OnUpdate()
         {
-            Debug.Log(test);
+            Debug.Log(_test);
             return NodeStatus.SUCCES;
         }
     }

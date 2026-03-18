@@ -26,6 +26,8 @@ namespace Framework.BehaviourTreeSystem.Nodes.TaskNodes
             if (_objectToMove.transform.position.IsWithinRange(_targetPosition, REACHED_TARGET_RANGE))
                 return NodeStatus.SUCCES;
             
+            Debug.Log("move");
+            
             Vector2 dir = _targetPosition - (Vector2) _objectToMove.transform.position;
             _objectToMove.transform.Translate(dir.normalized * (_speed * Time.deltaTime), Space.World);
             
