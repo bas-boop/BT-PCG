@@ -201,7 +201,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -427,6 +427,7 @@ GameObject:
   - component: {fileID: 667829894}
   - component: {fileID: 667829893}
   - component: {fileID: 667829895}
+  - component: {fileID: 667829896}
   m_Layer: 0
   m_Name: Weapon
   m_TagString: Untagged
@@ -501,13 +502,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 667829892}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: -0.92387956, w: 0.38268343}
   m_LocalPosition: {x: -3.33, y: -3.43, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -135}
 --- !u!114 &667829895
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -520,6 +521,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a851cb9719b4a8a82292bb5fbf2d69c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC.Weapon
+--- !u!114 &667829896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 667829892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0e43dd8d8cd4a29a43de60c0c985f41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Framework.Visuals.SpriteBorder
+  shape: 1
+  color: {r: 0.52156866, g: 0.52156866, b: 0.52156866, a: 1}
 --- !u!1 &738093987
 GameObject:
   m_ObjectHideFlags: 0
@@ -707,6 +722,7 @@ GameObject:
   - component: {fileID: 1508413461}
   - component: {fileID: 1508413460}
   - component: {fileID: 1508413459}
+  - component: {fileID: 1508413462}
   m_Layer: 0
   m_Name: Weapon (1)
   m_TagString: Untagged
@@ -793,13 +809,27 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1508413458}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: -0.92387956, w: 0.38268343}
   m_LocalPosition: {x: -3.92, y: 3.57, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -135}
+--- !u!114 &1508413462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1508413458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0e43dd8d8cd4a29a43de60c0c985f41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Framework.Visuals.SpriteBorder
+  shape: 1
+  color: {r: 0.52156866, g: 0.52156866, b: 0.52156866, a: 1}
 --- !u!1 &1571112414
 GameObject:
   m_ObjectHideFlags: 0
@@ -918,6 +948,7 @@ GameObject:
   - component: {fileID: 1727360856}
   - component: {fileID: 1727360855}
   - component: {fileID: 1727360854}
+  - component: {fileID: 1727360857}
   m_Layer: 0
   m_Name: Weapon (2)
   m_TagString: Untagged
@@ -1004,13 +1035,27 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1727360853}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: -0.92387956, w: 0.38268343}
   m_LocalPosition: {x: 6.03, y: -3.46, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -135}
+--- !u!114 &1727360857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1727360853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0e43dd8d8cd4a29a43de60c0c985f41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Framework.Visuals.SpriteBorder
+  shape: 1
+  color: {r: 0.52156866, g: 0.52156866, b: 0.52156866, a: 1}
 --- !u!1 &1729432756
 GameObject:
   m_ObjectHideFlags: 0
@@ -1027,6 +1072,7 @@ GameObject:
   - component: {fileID: 1729432760}
   - component: {fileID: 1729432759}
   - component: {fileID: 1729432761}
+  - component: {fileID: 1729432765}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1254,6 +1300,20 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1729432765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1729432756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0e43dd8d8cd4a29a43de60c0c985f41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Framework.Visuals.SpriteBorder
+  shape: 2
+  color: {r: 0.30980393, g: 1, b: 0.30980393, a: 1}
 --- !u!1 &1828751074
 GameObject:
   m_ObjectHideFlags: 0
@@ -1265,6 +1325,7 @@ GameObject:
   - component: {fileID: 1828751077}
   - component: {fileID: 1828751076}
   - component: {fileID: 1828751075}
+  - component: {fileID: 1828751078}
   m_Layer: 0
   m_Name: GuardEnemy
   m_TagString: Untagged
@@ -1371,11 +1432,75 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1828751078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1828751074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0e43dd8d8cd4a29a43de60c0c985f41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Framework.Visuals.SpriteBorder
+  shape: 0
+  color: {r: 1, g: 0.30588236, b: 0.30588236, a: 1}
+--- !u!1 &2143393963
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2143393965}
+  - component: {fileID: 2143393964}
+  m_Layer: 0
+  m_Name: Global Volume
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2143393964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2143393963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.Volume
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: 2fed1d9c34797a34f9cbe436da015363, type: 2}
+--- !u!4 &2143393965
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2143393963}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -9.757833, y: -2.5751283, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 519420032}
+  - {fileID: 2143393965}
   - {fileID: 619394802}
   - {fileID: 1571112416}
   - {fileID: 1484063305}
