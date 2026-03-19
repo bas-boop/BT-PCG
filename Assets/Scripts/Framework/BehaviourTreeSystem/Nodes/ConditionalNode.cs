@@ -10,38 +10,36 @@ namespace Framework.BehaviourTreeSystem.Nodes
         private string[] _conditionNames;
         private Node _node;
         
-        public ConditionalNode(bool condition, Node node)
+        public ConditionalNode(bool condition, Node node, bool inverted = false)
         {
             _condition = condition;
             _node = node;
-        }
-
-        public ConditionalNode(string conditionName, Node node)
-        {
-            _conditionName = conditionName;
-            _node = node;
+            _inverted = inverted;
         }
         
-        public ConditionalNode(string conditionName, Node node, bool inverted)
+        public ConditionalNode(string conditionName, Node node, bool inverted = false)
         {
             _conditionName = conditionName;
             _node = node;
             _inverted = inverted;
         }
         
-        public ConditionalNode(Node node, params string[] conditionNameName)
+        public ConditionalNode(Node node, bool inverted = false, params string[] conditionNameName)
         {
-            _conditionNames = conditionNameName;
             _node = node;
+            _inverted = inverted;
+            _conditionNames = conditionNameName;
         }
 
-        public ConditionalNode(string conditionName)
+        public ConditionalNode(string conditionName, bool inverted = false)
         {
             _conditionName = conditionName;
+            _inverted = inverted;
         }
         
-        public ConditionalNode(params string[] conditionNameName)
+        public ConditionalNode(bool inverted = false, params string[] conditionNameName)
         {
+            _inverted = inverted;
             _conditionNames = conditionNameName;
         }
         
