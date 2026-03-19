@@ -5,11 +5,14 @@ using Framework.BehaviourTreeSystem;
 using Framework.BehaviourTreeSystem.Nodes;
 using Framework.BehaviourTreeSystem.Nodes.TaskNodes;
 
+using CollectionExtensions = Framework.Extensions.CollectionExtensions;
+
 namespace NPC
 {
     public sealed class GuardEnemy : MonoBehaviour
     {
         [SerializeField] private GameObject player;
+        [SerializeField] private Weapon weapon;
         [SerializeField] private GameObject[] waypoints;
         
         [SerializeField] private float speed = 1;
@@ -31,6 +34,7 @@ namespace NPC
             Node screachWeapon = new LogNode("");
 
             _dictWrapper.Set("playerPosition", Vector2.zero);
+            _dictWrapper.Set("weaponPosition", Vector2.zero);
             _dictWrapper.Set("canSeePlayer", false);
             _dictWrapper.Set("hasWeapon", false);
             _dictWrapper.Set("isInRange", false);
@@ -41,6 +45,8 @@ namespace NPC
                     new ConditionalNode("canSeePlayer"),
                         new InvertNode(new ConditionalNode("hasWeapon")),
                         new WaitNode(1),
+                        new FunctionNode(FindWeapon),
+                        new MoveNode(gameObject, "weaponPosition", speed),
                         new FunctionNode(Search)
                     ),
                     "canSeePlayer", "hasWeapon"
@@ -78,6 +84,25 @@ namespace NPC
             _canSeePlayer = _dictWrapper.Get<bool>("canSeePlayer");
             _hasWeapon = _dictWrapper.Get<bool>("hasWeapon");
             _isInRange = _dictWrapper.Get<bool>("isInRange");
+        }
+
+        private void FindWeapon()
+        {
+            if (weapon)
+                return;
+            
+            while (true)
+            {
+                Weapon[] w = FindObjectsByType<Weapon>(FindObjectsSortMode.None);
+                weapon = CollectionExtensions.GetRandomItem(w);
+                
+                if (weapon.IsInUse)
+                    continue;
+                
+                break;
+            }
+            
+            _dictWrapper.Set("weaponPosition", (Vector2) weapon.transform.position);
         }
 
         private void Search()

@@ -32,7 +32,7 @@ namespace Framework.BehaviourTreeSystem.Nodes.TaskNodes
         protected override NodeStatus OnUpdate()
         {
             if (_targetPositionName != string.Empty)
-                _targetPosition = p_dictWrapper.Get<Vector2>("playerPosition");
+                _targetPosition = p_dictWrapper.Get<Vector2>(_targetPositionName);
             
             if (_objectToMove.transform.position.IsWithinRange(_targetPosition, REACHED_TARGET_RANGE))
                 return NodeStatus.SUCCES;
