@@ -29,5 +29,7 @@
             base.OnEnter();
             _nodeToInvert.SetDictWrapper(p_dictWrapper);
         }
+        
+        public override string NodeName() => $"InvertNode - {_nodeToInvert.NodeName()}";
     }
 }

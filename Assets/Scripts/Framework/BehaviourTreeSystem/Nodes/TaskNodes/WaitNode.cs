@@ -23,5 +23,7 @@ namespace Framework.BehaviourTreeSystem.Nodes.TaskNodes
             
             return p_currentWaitTime > 0 ? NodeStatus.RUNNING : NodeStatus.SUCCES;
         }
+        
+        public override string NodeName() => "WaitNode";
     }
 }

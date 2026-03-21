@@ -40,5 +40,7 @@ namespace Framework.BehaviourTreeSystem.Nodes
                 node.SetDictWrapper(p_dictWrapper);
             }
         }
+        
+        public override string NodeName() => "SequenceNode " + _nodes[_i].NodeName();
     }
 }

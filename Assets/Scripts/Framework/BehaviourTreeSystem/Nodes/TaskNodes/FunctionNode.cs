@@ -21,5 +21,7 @@ namespace Framework.BehaviourTreeSystem.Nodes.TaskNodes
             base.OnEnter();
             _func?.Invoke();
         }
+        
+        public override string NodeName() => "FunctionNode";
     }
 }

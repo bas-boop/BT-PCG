@@ -8,7 +8,7 @@ using Framework.BehaviourTreeSystem.Nodes;
 using Framework.BehaviourTreeSystem.Nodes.TaskNodes;
 using Framework.Extensions;
 using Gameplay;
-
+using UI;
 using CollectionExtensions = Framework.Extensions.CollectionExtensions;
 
 namespace NPC
@@ -26,6 +26,9 @@ namespace NPC
         [SerializeField] private float attackRange = 1;
         [SerializeField] private float attackCooldown = 1;
         [SerializeField] private int damage = 1;
+        
+        [Header("Debug")]
+        [SerializeField] private NodeDisplay nodeDisplay;
         
         private Node _tree;
         private Node _patrolTree;
@@ -57,6 +60,8 @@ namespace NPC
             }
             
             _tree.Update();
+            
+            nodeDisplay.SetNode(_tree.NodeName()); // name here
         }
 
         private void SetupTree()

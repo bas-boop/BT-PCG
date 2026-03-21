@@ -10,10 +10,7 @@ namespace Framework.BehaviourTreeSystem.Nodes.TaskNodes
             Debug.Log(p_dictWrapper.Get<float>("Test"));
             return NodeStatus.SUCCES;
         }
-
-        protected override void OnEnter()
-        {
-            base.OnEnter();
-        }
+        
+        public override string NodeName() => "YesNode";
     }
 }

@@ -14,5 +14,7 @@ namespace Framework.BehaviourTreeSystem.Nodes.TaskNodes
             base.OnEnter();
             p_dictWrapper.Set("Test", 3f);
         }
+        
+        public override string NodeName() => "NoNode";
     }
 }

@@ -14,5 +14,7 @@ namespace Framework.BehaviourTreeSystem.Nodes.TaskNodes
             Debug.Log("Set value");
             return NodeStatus.SUCCES;
         }
+        
+        public override string NodeName() => "SetValueNode";
     }
 }

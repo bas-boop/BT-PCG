@@ -16,5 +16,7 @@ namespace Framework.BehaviourTreeSystem.Nodes.TaskNodes
             Debug.Log(test);
             return NodeStatus.FAILED;
         }
+        
+        public override string NodeName() => "TestNode2";
     }
 }

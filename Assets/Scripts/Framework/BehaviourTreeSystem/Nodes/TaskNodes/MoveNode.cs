@@ -42,5 +42,7 @@ namespace Framework.BehaviourTreeSystem.Nodes.TaskNodes
             
             return NodeStatus.RUNNING;
         }
+        
+        public override string NodeName() => "MoveNode";
     }
 }

@@ -13,5 +13,7 @@ namespace Framework.BehaviourTreeSystem.Nodes.TaskNodes
             Debug.Log(_message);
             return NodeStatus.SUCCES;
         }
+
+        public override string NodeName() => "LogNode";
     }
 }

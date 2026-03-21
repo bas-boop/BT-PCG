@@ -6,7 +6,7 @@
         protected NodeStatus p_status;
      
         private bool _hasEntered;
-
+        
         public virtual void OnReset() { }
 
         public NodeStatus Update()
@@ -36,5 +36,7 @@
         protected virtual void OnEnter() { }
         
         protected virtual void OnExit() { }
+        
+        public virtual string NodeName() => "Node";
     }
 }

@@ -30,5 +30,7 @@ namespace Framework.BehaviourTreeSystem.Nodes
                 node.SetDictWrapper(p_dictWrapper);
             }
         }
+
+        public override string NodeName() => _nodes.Aggregate("ParallelNode - ", (current, node) => current + $" {node.NodeName()}");
     }
 }

@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Framework.BehaviourTreeSystem.Nodes
+﻿namespace Framework.BehaviourTreeSystem.Nodes
 {
     public class ConditionalNode : Node
     {
@@ -81,6 +79,29 @@ namespace Framework.BehaviourTreeSystem.Nodes
         {
             base.OnEnter();
             _node?.SetDictWrapper(p_dictWrapper);
+        }
+        
+        public override string NodeName()
+        {
+            if (_conditionName != string.Empty)
+                return $"ConditionalNode - {_conditionName}";
+
+            if (_conditionNames.Length > 0)
+            {
+                string name = "ConditionalNode - ";
+
+                foreach (string conname in _conditionNames)
+                {
+                    name += $" {conname}";
+                }
+
+                if (_node != null)
+                    name += $" {_node.NodeName()}";
+                
+                return name;
+            }
+
+            return _node.NodeName();
         }
     }
 }

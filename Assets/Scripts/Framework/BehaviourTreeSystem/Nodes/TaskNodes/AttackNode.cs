@@ -23,5 +23,7 @@ namespace Framework.BehaviourTreeSystem.Nodes.TaskNodes
             _healthToDamage.TakeDamage(_damage);
             base.OnEnter();
         }
+        
+        public override string NodeName() => "AttackNode";
     }
 }
