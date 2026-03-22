@@ -18,6 +18,7 @@ namespace UI
         public void SetNode(string targetNode)
         {
             _nodeName = targetNode;
+            Debug.Log(_nodeName);
         }
     }
 }
