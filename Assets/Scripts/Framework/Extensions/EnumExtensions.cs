@@ -1,8 +1,10 @@
 using System;
 using System.Reflection;
+using UnityEngine;
 using Random = System.Random;
 
 using Framework.Attributes;
+using FrameWork.Attributes;
 
 namespace Framework.Extensions
 {
@@ -37,15 +39,43 @@ namespace Framework.Extensions
         }
         
         /// <summary>
+        /// Get the Vector2 of an enum type.
+        /// </summary>
+        /// <param name="value">The enum that you want the Vector2 from.</param>
+        /// <returns>The Vector2Value, if not existing returns vector2.zero.</returns>
+        public static Vector2 GetVector2(this Enum value)
+        {
+            Type type = value.GetType();
+            FieldInfo fieldInfo = type.GetField(value.ToString());
+            Vector2Value attribute = (Vector2Value)Attribute.GetCustomAttribute(fieldInfo, typeof(Vector2Value));
+
+            return attribute?.Value ?? Vector2.zero;
+        }
+        
+        /// <summary>
+        /// Get the Vector3 of an enum type.
+        /// </summary>
+        /// <param name="value">The enum that you want the Vector3 from.</param>
+        /// <returns>The Vector3Value, if not existing returns vector3.zero.</returns>
+        public static Vector3 GetVector3(this Enum value)
+        {
+            Type type = value.GetType();
+            FieldInfo fieldInfo = type.GetField(value.ToString());
+            Vector3Value attribute = (Vector3Value)Attribute.GetCustomAttribute(fieldInfo, typeof(Vector3Value));
+
+            return attribute?.Value ?? Vector3.zero;
+        }
+        
+        /// <summary>
         /// Retrieves a random enum value of the specified type.
         /// </summary>
         /// <typeparam name="T">The enum type.</typeparam>
         /// <returns>A random enum value of type T.</returns>
-        public static T GetRandomEnumValue<T>()
+        public static T GetRandomEnumValue<T>(Random r = null)
         {
             Array enumValues = Enum.GetValues(typeof(T));
-            Random random = new Random();
-            return (T)enumValues.GetValue(random.Next(enumValues.Length));
+            r ??= new ();
+            return (T)enumValues.GetValue(r.Next(enumValues.Length));
         }
     }
 }

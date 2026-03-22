@@ -18,5 +18,7 @@ namespace Framework.DungeonGeneratorSystem
         public static int GetRandomInt() => _random.Next();
 
         public static float GetRandomFloat() => (float) GetRandomDouble();
+
+        public static Random GetRandom() => _random;
     }
 }
