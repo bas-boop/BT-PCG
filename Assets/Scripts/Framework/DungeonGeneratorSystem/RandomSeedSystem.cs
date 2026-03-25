@@ -4,7 +4,7 @@ namespace Framework.DungeonGeneratorSystem
 {
     public static class RandomSeedSystem
     {
-        private static int _seed;
+        private static int _seed = 00000;
         private static Random _random;
 
         public static void SetSeed(string seed)

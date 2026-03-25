@@ -11,16 +11,10 @@ namespace Framework.DungeonGeneratorSystem
 
         private int _times;
 
-        private void Start()
-        {
-            SetRandomColors();
-            InvokeRepeating(nameof(Walk), 0,  .5f);
-        }
-
         [ContextMenu("Do random colors")]
-        private void SetRandomColors()
+        public void SetRandomColors()
         {
-            RandomSeedSystem.SetSeed(seed);
+            //RandomSeedSystem.SetSeed(seed);
 
             foreach (SpriteRenderer sprite in sprites)
             {
