@@ -53,6 +53,21 @@ namespace Framework.Extensions
         }
         
         /// <summary>
+        /// Get the Vector2 of an enum type.
+        /// </summary>
+        /// <param name="value">The enum that you want the Vector2 from.</param>
+        /// <returns>The Vector2Value, if not existing returns vector2.zero.</returns>
+        public static Vector2Int GetVector2Int(this Enum value)
+        {
+            Type type = value.GetType();
+            FieldInfo fieldInfo = type.GetField(value.ToString());
+            Vector2Value attribute = (Vector2Value)Attribute.GetCustomAttribute(fieldInfo, typeof(Vector2Value));
+            Vector2Int vector2Int = new Vector2Int(Mathf.RoundToInt(attribute.Value.x), Mathf.RoundToInt(attribute.Value.y));
+
+            return vector2Int;
+        }
+        
+        /// <summary>
         /// Get the Vector3 of an enum type.
         /// </summary>
         /// <param name="value">The enum that you want the Vector3 from.</param>
