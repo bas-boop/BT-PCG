@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 using Framework.Extensions;
@@ -14,6 +15,10 @@ namespace Framework.DungeonGeneratorSystem
         
         private int[,] _grid;
         private Vector2Int _currentPos = Vector2Int.one * 5;
+        private Vector2Int _startPos;
+        private Vector2Int _endPos;
+
+        private readonly Dictionary<Vector2Int, SpriteRenderer> _cells = new ();
 
         public void Generate()
         {
@@ -32,18 +37,32 @@ namespace Framework.DungeonGeneratorSystem
                 }
             }
 
-            _currentPos.x = RandomSeedSystem.GetRandomInt(0, size.x);
-            _currentPos.y = RandomSeedSystem.GetRandomInt(0, size.y);
-
-            Debug.Log($"{_grid.GetLength(0)} - {_grid.GetLength(1)}");
+            _startPos.x = RandomSeedSystem.GetRandomInt(0, size.x);
+            _startPos.y = RandomSeedSystem.GetRandomInt(0, size.y);
+            _currentPos = _startPos;
             
             for (int i = 0; i < stepAmount; i++)
             {
                 Walk();
                 _grid[_currentPos.x, _currentPos.y] = 1;
+
+                if (i != stepAmount - 1)
+                    continue;
+                
+                _endPos = _currentPos;
+
+                // todo: fix (seed: 0)
+                while (_endPos == _startPos)
+                {
+                    _endPos.x = RandomSeedSystem.GetRandomInt(0, size.x);
+                    _endPos.y = RandomSeedSystem.GetRandomInt(0, size.y);
+                        
+                    if (_endPos != _startPos)
+                        break;
+                }
             }
 
-            LogGrid();
+            //LogGrid();
             ShowGrid();
         }
         
@@ -81,14 +100,33 @@ namespace Framework.DungeonGeneratorSystem
 
         private void ShowGrid()
         {
+            _cells.Clear();
+            
             for (int x = 0; x < size.x; x++)
             {
                 for (int y = 0; y < size.y; y++)
                 {
-                    SpriteRenderer sr = Instantiate(cell, new (x, y, 0), Quaternion.identity, transform);
+                    Vector2Int pos = new(x, y);
+                    
+                    if (_cells.ContainsKey(pos))
+                        continue;
+                    
+                    SpriteRenderer sr = Instantiate(cell, (Vector3Int) pos, Quaternion.identity, transform);
                     sr.color = _grid[x, y] == 1 ? colors[1] : colors[0];
+                    _cells.Add(pos, sr);
+
+                    if (_startPos.x == x
+                        && _startPos.y == y)
+                        sr.color = colors[2];
+                    
+                    if (_endPos.x == x
+                        && _endPos.y == y)
+                        sr.color = colors[3];
                 }
             }
+            
+            Debug.Log(_startPos);
+            Debug.Log(_endPos);
         }
     }
 }
