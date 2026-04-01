@@ -1018,11 +1018,17 @@ MonoBehaviour:
   cell: {fileID: 2054692665245256436, guid: b79d63d7ff3b85a4f970fd7e13695d73, type: 3}
   size: {x: 20, y: 20}
   stepAmount: 150
+  positiveRooms: 1
+  negativeRooms: 10
+  secretRooms: 1
   colors:
   - {r: 0.11764707, g: 0.11764707, b: 0.18039216, a: 1}
   - {r: 0.6509804, g: 0.5411765, b: 0.7176471, a: 1}
+  - {r: 0, g: 1, b: 1, a: 1}
   - {r: 0, g: 1, b: 0, a: 1}
   - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 1, g: 1, b: 0, a: 1}
+  - {r: 0.6509804, g: 0.5411765, b: 0.7176471, a: 0.5019608}
 --- !u!4 &943350463
 Transform:
   m_ObjectHideFlags: 0

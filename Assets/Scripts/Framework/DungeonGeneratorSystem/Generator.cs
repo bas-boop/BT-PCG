@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
@@ -12,15 +13,18 @@ namespace Framework.DungeonGeneratorSystem
         [SerializeField] private SpriteRenderer cell;
         [SerializeField] private Vector2Int size = Vector2Int.one * 20;
         [SerializeField] private int stepAmount = 5;
+        [SerializeField] private int positiveRooms;
+        [SerializeField] private int negativeRooms;
+        [SerializeField] private int secretRooms = 1;
         [SerializeField] private Color[] colors;
         
         private int[,] _grid;
-        private List<SpriteRenderer> _cellSprites = new ();
+        private readonly List<SpriteRenderer> _cellSprites = new ();
         private Vector2Int _currentPos = Vector2Int.one * 5;
         private Vector2Int _startPos;
         private Vector2Int _endPos;
 
-        private Dictionary<Vector2Int, SpriteRenderer> _cells = new ();
+        private readonly Dictionary<Vector2Int, SpriteRenderer> _cells = new ();
 
         public void Generate()
         {
@@ -64,8 +68,63 @@ namespace Framework.DungeonGeneratorSystem
                 FixEndPosition();
 
             ColorGrid();
+            
+            for (int i = 0; i < negativeRooms; i++)
+            {
+                PlaceSpecialRoomRandom(colors[4]);   
+            }
+            
+            for (int i = 0; i < positiveRooms; i++)
+            {
+                PlaceSpecialRoomRandom(colors[5]);   
+            }
+            
+            for (int i = 0; i < secretRooms; i++)
+            {
+                PlaceSpecialRoomByDistance(colors[6]);   
+            }
         }
-        
+
+        private void PlaceSpecialRoomRandom(Color roomColor)
+        {
+            float distance = 0;
+            KeyValuePair<Vector2Int, SpriteRenderer> cellToMakeRoom = new ();
+
+            while (true)
+            {
+                SpriteRenderer a = CollectionExtensions.GetRandomItem(_cellSprites, RandomSeedSystem.GetRandom());
+                Vector2Int b = new (Mathf.RoundToInt(a.transform.position.x), Mathf.RoundToInt(a.transform.position.y));
+                cellToMakeRoom = new (b, a);
+                
+                if (_cells[b].color == colors[1])
+                    break;
+            }
+
+            cellToMakeRoom.Value.color = roomColor;
+        }
+
+        private void PlaceSpecialRoomByDistance(Color roomColor)
+        {
+            float distance = 0;
+            KeyValuePair<Vector2Int, SpriteRenderer> cellToMakeRoom = new ();
+            
+            foreach (KeyValuePair<Vector2Int, SpriteRenderer> valuePair in _cells)
+            {
+                if (valuePair.Value.color != colors[1])
+                    continue;
+
+                float distanceToStart = _startPos.magnitude - valuePair.Key.magnitude;
+
+                if (distanceToStart > distance)
+                {
+                    distance = distanceToStart;
+                    cellToMakeRoom = valuePair;
+                }
+            }
+
+            cellToMakeRoom.Value.color = roomColor;
+        }
+
         private void Walk()
         {
             CardinalDirections r = EnumExtensions.GetRandomEnumValue<CardinalDirections>(RandomSeedSystem.GetRandom());
@@ -137,9 +196,6 @@ namespace Framework.DungeonGeneratorSystem
                         sr.color = colors[3];
                 }
             }
-            
-            Debug.Log(_startPos);
-            Debug.Log(_endPos);
         }
         
         private void FixEndPosition()
