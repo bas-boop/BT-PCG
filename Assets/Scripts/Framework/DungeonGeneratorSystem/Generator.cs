@@ -3,6 +3,7 @@ using System.Text;
 using UnityEngine;
 
 using Framework.Extensions;
+using CollectionExtensions = Framework.Extensions.CollectionExtensions;
 
 namespace Framework.DungeonGeneratorSystem
 {
@@ -14,11 +15,12 @@ namespace Framework.DungeonGeneratorSystem
         [SerializeField] private Color[] colors;
         
         private int[,] _grid;
+        private List<SpriteRenderer> _cellSprites = new ();
         private Vector2Int _currentPos = Vector2Int.one * 5;
         private Vector2Int _startPos;
         private Vector2Int _endPos;
 
-        private readonly Dictionary<Vector2Int, SpriteRenderer> _cells = new ();
+        private Dictionary<Vector2Int, SpriteRenderer> _cells = new ();
 
         public void Generate()
         {
@@ -41,29 +43,27 @@ namespace Framework.DungeonGeneratorSystem
             _startPos.y = RandomSeedSystem.GetRandomInt(0, size.y);
             _currentPos = _startPos;
             
+            BuildGrid();
+            
             for (int i = 0; i < stepAmount; i++)
             {
                 Walk();
                 _grid[_currentPos.x, _currentPos.y] = 1;
-
+                
+                if (!_cellSprites.Contains(_cells[_currentPos]))
+                    _cellSprites.Add(_cells[_currentPos]);
+                
                 if (i != stepAmount - 1)
                     continue;
                 
                 _endPos = _currentPos;
-
-                // todo: fix (seed: 0)
-                while (_endPos == _startPos)
-                {
-                    _endPos.x = RandomSeedSystem.GetRandomInt(0, size.x);
-                    _endPos.y = RandomSeedSystem.GetRandomInt(0, size.y);
-                        
-                    if (_endPos != _startPos)
-                        break;
-                }
             }
+            
+            // seed "0" has the same place
+            if (_endPos == _startPos)
+                FixEndPosition();
 
-            //LogGrid();
-            ShowGrid();
+            ColorGrid();
         }
         
         private void Walk()
@@ -98,10 +98,11 @@ namespace Framework.DungeonGeneratorSystem
             Debug.Log(sb.ToString());
         }
 
-        private void ShowGrid()
+        private void BuildGrid()
         {
             _cells.Clear();
-            
+            _cellSprites.Clear();
+
             for (int x = 0; x < size.x; x++)
             {
                 for (int y = 0; y < size.y; y++)
@@ -112,21 +113,45 @@ namespace Framework.DungeonGeneratorSystem
                         continue;
                     
                     SpriteRenderer sr = Instantiate(cell, (Vector3Int) pos, Quaternion.identity, transform);
-                    sr.color = _grid[x, y] == 1 ? colors[1] : colors[0];
+                    sr.gameObject.name = $"Cell {pos}";
                     _cells.Add(pos, sr);
+                }
+            }
+        }
+        
+        private void ColorGrid()
+        {
+            for (int x = 0; x < size.x; x++)
+            {
+                for (int y = 0; y < size.y; y++)
+                {
+                    if (!_cells.TryGetValue(new (x, y), out SpriteRenderer sr))
+                        continue;
 
-                    if (_startPos.x == x
-                        && _startPos.y == y)
+                    sr.color = _grid[x, y] == 1 ? colors[1] : colors[0];
+
+                    if (_startPos.x == x && _startPos.y == y)
                         sr.color = colors[2];
-                    
-                    if (_endPos.x == x
-                        && _endPos.y == y)
+
+                    if (_endPos.x == x && _endPos.y == y)
                         sr.color = colors[3];
                 }
             }
             
             Debug.Log(_startPos);
             Debug.Log(_endPos);
+        }
+        
+        private void FixEndPosition()
+        {
+            if (_cellSprites.Count <= 0)
+                return;
+                    
+            SpriteRenderer a = CollectionExtensions.GetRandomItem(_cellSprites, RandomSeedSystem.GetRandom());
+            _endPos = new (Mathf.RoundToInt(a.transform.position.x), Mathf.RoundToInt(a.transform.position.y));
+            
+            if (_endPos == _startPos)
+                FixEndPosition();
         }
     }
 }
