@@ -113,8 +113,8 @@ namespace Framework.DungeonGeneratorSystem
                 if (valuePair.Value.color != colors[1])
                     continue;
 
-                float distanceToStart = _startPos.magnitude - valuePair.Key.magnitude;
-
+                float distanceToStart = Math.Abs(_startPos.magnitude - valuePair.Key.magnitude);
+                
                 if (distanceToStart > distance)
                 {
                     distance = distanceToStart;
