@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -17,13 +17,13 @@ namespace Framework.DungeonGeneratorSystem
         [SerializeField] private int negativeRooms;
         [SerializeField] private int secretRooms = 1;
         [SerializeField] private Color[] colors;
-        
-        private int[,] _grid;
-        private readonly Dictionary<Vector2Int, SpriteRenderer> _cells = new ();
-        private readonly List<SpriteRenderer> _cellSprites = new ();
-        private Vector2Int _currentPos = Vector2Int.one * 5;
+
+        private readonly Dictionary<Vector2Int, Cell> _cells = new();
+        private Vector2Int _currentPos;
         private Vector2Int _startPos;
         private Vector2Int _endPos;
+
+        private IEnumerable<KeyValuePair<Vector2Int, Cell>> ActiveCells => _cells.Where(kvp => kvp.Value.Type != CellType.EMPTY);
 
         public void Generate()
         {
@@ -35,15 +35,47 @@ namespace Framework.DungeonGeneratorSystem
                 FixEndPosition();
 
             ColorGrid();
-            
+
             for (int i = 0; i < negativeRooms; i++)
-                PlaceSpecialRoomRandom(colors[4]);
-            
+                PlaceSpecialRoomRandom(CellType.NEGATIVE);
+
             for (int i = 0; i < positiveRooms; i++)
-                PlaceSpecialRoomRandom(colors[5]);
-            
+                PlaceSpecialRoomRandom(CellType.POSITIVE);
+
             for (int i = 0; i < secretRooms; i++)
-                PlaceSpecialRoomByDistance(colors[6]);
+                PlaceSpecialRoomByDistance(CellType.SECRET);
+        }
+
+        private void Setup()
+        {
+            for (int i = transform.childCount - 1; i >= 0; i--)
+                Destroy(transform.GetChild(i).gameObject);
+
+            _cells.Clear();
+
+            _startPos.x = RandomSeedSystem.GetRandomInt(0, size.x);
+            _startPos.y = RandomSeedSystem.GetRandomInt(0, size.y);
+            _currentPos = _startPos;
+
+            BuildGrid();
+        }
+
+        private void BuildGrid()
+        {
+            for (int x = 0; x < size.x; x++)
+            {
+                for (int y = 0; y < size.y; y++)
+                {
+                    Vector2Int pos = new(x, y);
+
+                    if (_cells.ContainsKey(pos))
+                        continue;
+
+                    SpriteRenderer sr = Instantiate(cell, (Vector3Int)pos, Quaternion.identity, transform);
+                    sr.gameObject.name = $"Cell {pos}";
+                    _cells[pos] = new (CellType.EMPTY, sr);
+                }
+            }
         }
 
         private void RandomWalk()
@@ -51,158 +83,114 @@ namespace Framework.DungeonGeneratorSystem
             for (int i = 0; i < stepAmount; i++)
             {
                 Walk();
-                _grid[_currentPos.x, _currentPos.y] = 1;
-                
-                if (!_cellSprites.Contains(_cells[_currentPos]))
-                    _cellSprites.Add(_cells[_currentPos]);
-                
-                if (i != stepAmount - 1)
+                Cell current = _cells[_currentPos];
+
+                if (current.Type == CellType.EMPTY)
+                    SetCellType(_currentPos, CellType.NORMAL);
+
+                if (i == stepAmount - 1)
+                    _endPos = _currentPos;
+            }
+        }
+
+        private void Walk()
+        {
+            CardinalDirections r = EnumExtensions.GetRandomEnumValue<CardinalDirections>(RandomSeedSystem.GetRandom());
+            _currentPos += r.GetVector2Int();
+
+            _currentPos.x = Mathf.Clamp(_currentPos.x, 0, size.x - 1);
+            _currentPos.y = Mathf.Clamp(_currentPos.y, 0, size.y - 1);
+        }
+
+        private void FixEndPosition()
+        {
+            List<KeyValuePair<Vector2Int, Cell>> active = ActiveCells.ToList();
+            
+            if (active.Count <= 0)
+                return;
+
+            KeyValuePair<Vector2Int, Cell> picked = CollectionExtensions.GetRandomItem(active, RandomSeedSystem.GetRandom());
+            _endPos = picked.Key;
+
+            if (_endPos == _startPos)
+                FixEndPosition();
+        }
+
+        private void ColorGrid()
+        {
+            foreach (Vector2Int pos in _cells.Keys.ToList())
+            {
+                CellType type = pos == _startPos ? CellType.START
+                                : pos == _endPos ? CellType.END
+                                : _cells[pos].Type;
+
+                SetCellType(pos, type);
+            }
+        }
+
+        private void PlaceSpecialRoomRandom(CellType roomType)
+        {
+            List<KeyValuePair<Vector2Int, Cell>> candidates = ActiveCells.Where(kvp => kvp.Value.Type == CellType.NORMAL).ToList();
+
+            while (true)
+            {
+                KeyValuePair<Vector2Int, Cell> picked = CollectionExtensions.GetRandomItem(candidates, RandomSeedSystem.GetRandom());
+
+                if (picked.Value.Type != CellType.NORMAL)
                     continue;
                 
-                _endPos = _currentPos;
+                SetCellType(picked.Key, roomType);
+                break;
             }
         }
 
-        private void Setup()
+        private void PlaceSpecialRoomByDistance(CellType roomType)
         {
-            for (int i = transform.childCount - 1; i >= 0; i--)
-                Destroy(transform.GetChild(i).gameObject);
-            
-            _grid = new int[size.x, size.y];
-            
-            for (int x = 0; x < size.x; x++)
+            float bestDistance = 0f;
+            Vector2Int bestPos = default;
+            bool found = false;
+
+            foreach (KeyValuePair<Vector2Int, Cell> kvp in _cells)
             {
-                for (int y = 0; y < size.y; y++)
-                {
-                    _grid[x, y] = 0;
-                }
+                if (kvp.Value.Type != CellType.NORMAL)
+                    continue;
+
+                float dist = Vector2Int.Distance(_startPos, kvp.Key);
+
+                if (dist <= bestDistance)
+                    continue;
+                
+                bestDistance = dist;
+                bestPos = kvp.Key;
+                found = true;
             }
 
-            _startPos.x = RandomSeedSystem.GetRandomInt(0, size.x);
-            _startPos.y = RandomSeedSystem.GetRandomInt(0, size.y);
-            _currentPos = _startPos;
-            
-            BuildGrid();
+            if (found)
+                SetCellType(bestPos, roomType);
         }
 
-        private void BuildGrid()
+        private void SetCellType(Vector2Int pos, CellType type)
         {
-            _cells.Clear();
-            _cellSprites.Clear();
+            if (!_cells.TryGetValue(pos, out Cell cellOut))
+                return;
+
+            cellOut.Type = type;
+            cellOut.Renderer.color = colors[(int)type];
+            _cells[pos] = cellOut;
+        }
+
+        private void LogGrid()
+        {
+            StringBuilder sb = new();
 
             for (int x = 0; x < size.x; x++)
             {
                 for (int y = 0; y < size.y; y++)
                 {
                     Vector2Int pos = new(x, y);
-                    
-                    if (_cells.ContainsKey(pos))
-                        continue;
-                    
-                    SpriteRenderer sr = Instantiate(cell, (Vector3Int) pos, Quaternion.identity, transform);
-                    sr.gameObject.name = $"Cell {pos}";
-                    _cells.Add(pos, sr);
+                    int val = _cells.TryGetValue(pos, out Cell c) ? (int)c.Type : 0;
+                    sb.Append(val).Append(' ');
                 }
-            }
-        }
-        
-        private void Walk()
-        {
-            CardinalDirections r = EnumExtensions.GetRandomEnumValue<CardinalDirections>(RandomSeedSystem.GetRandom());
-            _currentPos += r.GetVector2Int();
-            
-            if (_currentPos.x < 0)
-                _currentPos.x = 0;
-            if (_currentPos.y < 0)
-                _currentPos.y = 0;
-            if (_currentPos.x >= size.x)
-                _currentPos.x = size.x - 1;
-            if (_currentPos.y >= size.y)
-                _currentPos.y = size.y - 1;
-        }
-        
-        private void FixEndPosition()
-        {
-            if (_cellSprites.Count <= 0)
-                return;
-                    
-            SpriteRenderer a = CollectionExtensions.GetRandomItem(_cellSprites, RandomSeedSystem.GetRandom());
-            _endPos = new (Mathf.RoundToInt(a.transform.position.x), Mathf.RoundToInt(a.transform.position.y));
-            
-            if (_endPos == _startPos)
-                FixEndPosition();
-        }
-        
-        private void ColorGrid()
-        {
-            for (int x = 0; x < size.x; x++)
-            {
-                for (int y = 0; y < size.y; y++)
-                {
-                    if (!_cells.TryGetValue(new (x, y), out SpriteRenderer sr))
-                        continue;
-
-                    sr.color = _grid[x, y] == 1 ? colors[1] : colors[0];
-
-                    if (_startPos.x == x && _startPos.y == y)
-                        sr.color = colors[2];
-
-                    if (_endPos.x == x && _endPos.y == y)
-                        sr.color = colors[3];
-                }
-            }
-        }
-
-        private void PlaceSpecialRoomRandom(Color roomColor)
-        {
-            KeyValuePair<Vector2Int, SpriteRenderer> cellToMakeRoom;
-
-            while (true)
-            {
-                SpriteRenderer a = CollectionExtensions.GetRandomItem(_cellSprites, RandomSeedSystem.GetRandom());
-                Vector2Int b = new (Mathf.RoundToInt(a.transform.position.x), Mathf.RoundToInt(a.transform.position.y));
-                cellToMakeRoom = new (b, a);
-                
-                if (_cells[b].color == colors[1])
-                    break;
-            }
-
-            cellToMakeRoom.Value.color = roomColor;
-        }
-
-        private void PlaceSpecialRoomByDistance(Color roomColor)
-        {
-            float distance = 0;
-            KeyValuePair<Vector2Int, SpriteRenderer> cellToMakeRoom = new ();
-            
-            foreach (KeyValuePair<Vector2Int, SpriteRenderer> valuePair in _cells)
-            {
-                if (valuePair.Value.color != colors[1])
-                    continue;
-
-                float distanceToStart = Math.Abs(_startPos.magnitude - valuePair.Key.magnitude);
-                
-                if (distanceToStart > distance)
-                {
-                    distance = distanceToStart;
-                    cellToMakeRoom = valuePair;
-                }
-            }
-
-            cellToMakeRoom.Value.color = roomColor;
-        }
-        
-        private void LogGrid()
-        {
-            StringBuilder sb = new ();
-
-            for (int i = 0; i < _grid.GetLength(0); i++)
-            {
-                for (int j = 0; j < _grid.GetLength(1); j++)
-                {
-                    sb.Append(_grid[i, j]).Append(" ");
-                }
-                
                 sb.AppendLine();
             }
 
