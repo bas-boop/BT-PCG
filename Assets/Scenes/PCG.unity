@@ -1930,6 +1930,7 @@ MonoBehaviour:
   - {r: 1, g: 0, b: 0, a: 1}
   - {r: 1, g: 1, b: 0, a: 1}
   - {r: 0.6222224, g: 0, b: 1, a: 0.023529412}
+  test: -1
 --- !u!4 &943350463
 Transform:
   m_ObjectHideFlags: 0
