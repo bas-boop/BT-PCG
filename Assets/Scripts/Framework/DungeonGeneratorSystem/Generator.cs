@@ -242,10 +242,6 @@ namespace Framework.DungeonGeneratorSystem
                 }
             }
             Debug.Log($"CleanupDoors removed {removed} doors");
-            
-            // Temporary: right after CleanupDoors, verify (4,11) specifically
-            var test = _cells[new Vector2Int(4, 11)];
-            Debug.Log($"After cleanup (4,11): doors={test.Doors}, northNeighbor type={_cells[new Vector2Int(4, 12)].Type}");
         }
 
         private bool HasEmptyNeighbor(Vector2Int pos, CardinalDirections dir)
