@@ -9,8 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 500b4d19987c445e8492a56367d88863, type: 3}
-  m_Name: NewGenerationRule
-  m_EditorClassIdentifier: Assembly-CSharp::Framework.DungeonGeneratorSystem.Rules.GenerationRule
-  amount: 5
+  m_Script: {fileID: 11500000, guid: 87067e5771164ff9a10820e03ec9c543, type: 3}
+  m_Name: 2PosDoorcount3
+  m_EditorClassIdentifier: Assembly-CSharp::Framework.DungeonGeneratorSystem.Rules.DoorCountGenerationRule
+  amount: 2
   roomType: 5
+  minDoors: 1
+  maxDoors: 3

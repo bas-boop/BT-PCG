@@ -6,7 +6,9 @@ using UnityEngine;
 
 using Framework.DungeonGeneratorSystem.Rules;
 using Framework.Extensions;
+
 using CollectionExtensions = Framework.Extensions.CollectionExtensions;
+using Quaternion = UnityEngine.Quaternion;
 
 namespace Framework.DungeonGeneratorSystem
 {
@@ -41,13 +43,18 @@ namespace Framework.DungeonGeneratorSystem
             {
                 for (int i = 0; i < genRule.amount; i++)
                 {
-                    if (genRule is DistanceGenerationRule dgr)
+                    switch (genRule)
                     {
-                        PlaceSpecialRoomByDistance(dgr);
-                        continue;
+                        case DistanceGenerationRule distanceRule:
+                            PlaceSpecialRoomByDistance(distanceRule);
+                            continue;
+                        case DoorCountGenerationRule doorCountRule:
+                            PlaceSpecialRoomByDoorCount(doorCountRule);
+                            continue;
+                        default:
+                            PlaceSpecialRoomRandom(genRule.roomType);
+                            break;
                     }
-                    
-                    PlaceSpecialRoomRandom(genRule.roomType);
                 }
             }
         }
@@ -169,6 +176,27 @@ namespace Framework.DungeonGeneratorSystem
             }
         }
 
+        private void PlaceSpecialRoomByDoorCount(DoorCountGenerationRule targetGr)
+        {
+            int lo = Mathf.Clamp(targetGr.minDoors, 1, 4);
+            int hi = Mathf.Clamp(targetGr.maxDoors, lo, 4);
+
+            List<KeyValuePair<Vector2Int, Cell>> candidates = ActiveCells
+                .Where(kvp =>
+                {
+                    if (kvp.Value.Type != CellType.NORMAL) return false;
+                    int count = GetDoorCount(kvp.Value.Doors);
+                    return count >= lo && count <= hi;
+                })
+                .ToList();
+
+            if (candidates.Count == 0)
+                return;
+
+            KeyValuePair<Vector2Int, Cell> picked = CollectionExtensions.GetRandomItem(candidates, RandomSeedSystem.GetRandom());
+            SetCellType(picked.Key, targetGr.roomType);
+        }
+
         private void PlaceSpecialRoomByDistance(DistanceGenerationRule targetGr)
         {
             float bestDistance = targetGr.distance == Distances.CLOSE ? float.MaxValue : 0f;
@@ -210,6 +238,11 @@ namespace Framework.DungeonGeneratorSystem
 
             if (found)
                 SetCellType(bestPos, targetGr.roomType);
+        }
+
+        private static int GetDoorCount(Doors doors)
+        {
+            return Enum.GetValues(typeof(Doors)).Cast<Doors>().Count(dir => doors.HasFlag(dir));
         }
 
         private void SetCellType(Vector2Int pos, CellType type)

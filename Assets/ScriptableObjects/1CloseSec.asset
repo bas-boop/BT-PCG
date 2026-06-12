@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d91a3b5a1ca42a78dd6dd99fb69e64d, type: 3}
-  m_Name: NewDistanceGenerationRule
+  m_Name: 1CloseSec
   m_EditorClassIdentifier: Assembly-CSharp::Framework.DungeonGeneratorSystem.Rules.DistanceGenerationRule
-  amount: 3
+  amount: 1
   roomType: 6
   otherRoomType: 2
-  distance: 1
+  distance: 0
