@@ -48,6 +48,9 @@ namespace Framework.DungeonGeneratorSystem
                         case DistanceGenerationRule distanceRule:
                             PlaceSpecialRoomByDistance(distanceRule);
                             continue;
+                        case DeadEndGenerationRule deadEndRule:
+                            PlaceSpecialRoomAtDeadEnd(deadEndRule);
+                            continue;
                         case DoorCountGenerationRule doorCountRule:
                             PlaceSpecialRoomByDoorCount(doorCountRule);
                             continue;
@@ -174,6 +177,27 @@ namespace Framework.DungeonGeneratorSystem
                 SetCellType(picked.Key, roomType);
                 break;
             }
+        }
+
+        private void PlaceSpecialRoomAtDeadEnd(DeadEndGenerationRule targetGr)
+        {
+            List<KeyValuePair<Vector2Int, Cell>> candidates = new();
+ 
+            foreach (KeyValuePair<Vector2Int, Cell> kvp in ActiveCells)
+            {
+                bool isNormal = kvp.Value.Type == CellType.NORMAL;
+                bool isDeadEnd = GetDoorCount(kvp.Value.Doors) == 1;
+ 
+                if (isNormal
+                    && isDeadEnd)
+                    candidates.Add(kvp);
+            }
+ 
+            if (candidates.Count == 0)
+                return;
+ 
+            KeyValuePair<Vector2Int, Cell> picked = CollectionExtensions.GetRandomItem(candidates, RandomSeedSystem.GetRandom());
+            SetCellType(picked.Key, targetGr.roomType);
         }
 
         private void PlaceSpecialRoomByDoorCount(DoorCountGenerationRule targetGr)

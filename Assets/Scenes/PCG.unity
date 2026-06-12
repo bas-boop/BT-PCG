@@ -1922,6 +1922,7 @@ MonoBehaviour:
   generationRules:
   - {fileID: 11400000, guid: adce76a569058f5429540fd5a63aa092, type: 2}
   - {fileID: 11400000, guid: 0a36b8868ae6839438eadfb57a4374e1, type: 2}
+  - {fileID: 11400000, guid: 349318d261264ad47af0782a7923c386, type: 2}
   - {fileID: 11400000, guid: c1f6dc1a8112e5f4ea101f62754c203e, type: 2}
   - {fileID: 11400000, guid: 3ef6ce722dc70f44e92f0d5ae8984e84, type: 2}
   - {fileID: 11400000, guid: 7093b0e3e30168a498e619811116fa29, type: 2}
