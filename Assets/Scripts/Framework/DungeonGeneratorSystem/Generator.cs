@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
+using Framework.DungeonGeneratorSystem.Rules;
 using Framework.Extensions;
 using CollectionExtensions = Framework.Extensions.CollectionExtensions;
 
@@ -14,7 +15,7 @@ namespace Framework.DungeonGeneratorSystem
         [SerializeField] private SpriteRenderer cell;
         [SerializeField] private Vector2Int size = Vector2Int.one * 20;
         [SerializeField] private int stepAmount = 5;
-        [SerializeField] private GenerationRules[] generationRules;
+        [SerializeField] private GenerationRule[] generationRules;
         [SerializeField] private Color[] colors;
         [SerializeField] private Doors test;
 
@@ -36,21 +37,17 @@ namespace Framework.DungeonGeneratorSystem
 
             ColorGrid();
 
-            foreach (GenerationRules genRule in generationRules)
+            foreach (GenerationRule genRule in generationRules)
             {
                 for (int i = 0; i < genRule.amount; i++)
                 {
-                    switch (genRule.rule)
+                    if (genRule is DistanceGenerationRule dgr)
                     {
-                        case Rule.RANDOM:
-                            PlaceSpecialRoomRandom(genRule.roomType);
-                            break;
-                        case Rule.DISTANCE:
-                            PlaceSpecialRoomByDistance(genRule);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
+                        PlaceSpecialRoomByDistance(dgr);
+                        continue;
                     }
+                    
+                    PlaceSpecialRoomRandom(genRule.roomType);
                 }
             }
         }
@@ -172,17 +169,17 @@ namespace Framework.DungeonGeneratorSystem
             }
         }
 
-        private void PlaceSpecialRoomByDistance(GenerationRules targetGenerationRules)
+        private void PlaceSpecialRoomByDistance(DistanceGenerationRule targetGr)
         {
-            float bestDistance = 0f;
+            float bestDistance = targetGr.distance == Distances.CLOSE ? float.MaxValue : 0f;
             Vector2Int bestPos = Vector2Int.zero;
-            Vector2Int distnaceCheck = Vector2Int.zero;
+            Vector2Int distanceCheck = Vector2Int.zero;
             bool found = false;
 
-            foreach (KeyValuePair<Vector2Int, Cell> kvp in _cells)
+            foreach (KeyValuePair<Vector2Int, Cell> kvp in _cells.Where(kvp => kvp.Value.Type == targetGr.otherRoomType))
             {
-                if (kvp.Value.Type == targetGenerationRules.otherRoomType)
-                    distnaceCheck = kvp.Key;
+                distanceCheck = kvp.Key;
+                break;
             }
 
             foreach (KeyValuePair<Vector2Int, Cell> kvp in _cells)
@@ -190,17 +187,20 @@ namespace Framework.DungeonGeneratorSystem
                 if (kvp.Value.Type != CellType.NORMAL)
                     continue;
 
-                float dist = Vector2Int.Distance(distnaceCheck, kvp.Key);
+                float dist = Vector2Int.Distance(distanceCheck, kvp.Key);
 
-                if (targetGenerationRules.distance == 0)
+                switch (targetGr.distance)
                 {
-                    if (dist <= bestDistance)
-                        continue;
-                }
-                else
-                {
-                    if (dist >= bestDistance)
-                        continue;
+                    case Distances.CLOSE:
+                        if (dist > bestDistance)
+                            continue;
+                        break;
+                    case Distances.FAR:
+                        if (dist <= bestDistance)
+                            continue;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
                 
                 bestDistance = dist;
@@ -209,7 +209,7 @@ namespace Framework.DungeonGeneratorSystem
             }
 
             if (found)
-                SetCellType(bestPos, targetGenerationRules.roomType);
+                SetCellType(bestPos, targetGr.roomType);
         }
 
         private void SetCellType(Vector2Int pos, CellType type)
@@ -237,29 +237,10 @@ namespace Framework.DungeonGeneratorSystem
             ShowCellDoors(cellOut);
         }
 
-        private void ShowCellDoors(Cell cell)
+        private void ShowCellDoors(Cell targetCell)
         {
-            foreach (Doors dir in System.Enum.GetValues(typeof(Doors)))
-            {
-                cell.DoorsObject[dir].SetActive(cell.Doors.HasFlag(dir));
-            }
-        }
-
-        private bool HasEmptyNeighbor(Vector2Int pos, CardinalDirections dir)
-        {
-            Vector2Int neighbor = pos + dir.GetVector2Int();
-
-            if (neighbor.x < 0 || neighbor.x >= size.x || neighbor.y < 0 || neighbor.y >= size.y)
-                return true;
-
-            return _cells[neighbor].Type == CellType.EMPTY;
-        }
-
-        private void RemoveDoor(Vector2Int pos, Doors door)
-        {
-            Cell cellToRemoveDoor = _cells[pos];
-            cellToRemoveDoor.Doors &= ~door;
-            _cells[pos] = cellToRemoveDoor;
+            foreach (Doors dir in Enum.GetValues(typeof(Doors)))
+                targetCell.DoorsObject[dir].SetActive(targetCell.Doors.HasFlag(dir));
         }
         
         private void LogGrid()

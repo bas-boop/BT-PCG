@@ -1920,36 +1920,10 @@ MonoBehaviour:
   size: {x: 20, y: 20}
   stepAmount: 150
   generationRules:
-  - amount: 2
-    roomType: 5
-    otherRoomType: 0
-    distance: 0
-    rule: 0
-  - amount: 10
-    roomType: 4
-    otherRoomType: 0
-    distance: 0
-    rule: 0
-  - amount: 1
-    roomType: 6
-    otherRoomType: 2
-    distance: 0
-    rule: 1
-  - amount: 1
-    roomType: 6
-    otherRoomType: 6
-    distance: 0
-    rule: 1
-  - amount: 1
-    roomType: 6
-    otherRoomType: 3
-    distance: 0
-    rule: 1
-  - amount: 1
-    roomType: 6
-    otherRoomType: 3
-    distance: 1
-    rule: 1
+  - {fileID: 11400000, guid: adce76a569058f5429540fd5a63aa092, type: 2}
+  - {fileID: 11400000, guid: 0a36b8868ae6839438eadfb57a4374e1, type: 2}
+  - {fileID: 11400000, guid: 7093b0e3e30168a498e619811116fa29, type: 2}
+  - {fileID: 11400000, guid: 61ce6d2933151c54297f978218d3f0c0, type: 2}
   colors:
   - {r: 0.11764707, g: 0.11764707, b: 0.18039216, a: 1}
   - {r: 0.6509804, g: 0.5411765, b: 0.7176471, a: 1}
