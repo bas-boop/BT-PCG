@@ -81,6 +81,15 @@ namespace Framework.Extensions
             return attribute?.Value ?? Vector3.zero;
         }
         
+        public static Color GetColor(this Enum value)
+        {
+            Type type = value.GetType();
+            FieldInfo fieldInfo = type.GetField(value.ToString());
+            ColorValue attribute = (ColorValue)Attribute.GetCustomAttribute(fieldInfo, typeof(ColorValue));
+
+            return attribute?.Value ?? Color.white;
+        }
+        
         /// <summary>
         /// Retrieves a random enum value of the specified type.
         /// </summary>

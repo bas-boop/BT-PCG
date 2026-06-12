@@ -18,7 +18,6 @@ namespace Framework.DungeonGeneratorSystem
         [SerializeField] private Vector2Int size = Vector2Int.one * 20;
         [SerializeField] private int stepAmount = 5;
         [SerializeField] private GenerationRule[] generationRules;
-        [SerializeField] private Color[] colors;
 
         private readonly Dictionary<Vector2Int, Cell> _cells = new();
         private Vector2Int _currentPos;
@@ -274,7 +273,7 @@ namespace Framework.DungeonGeneratorSystem
                 return;
 
             cellOut.Type = type;
-            cellOut.Renderer.color = colors[(int)type];
+            cellOut.Renderer.color = type.GetColor();
             _cells[pos] = cellOut;
             
             ShowCellDoors(cellOut);
@@ -287,7 +286,7 @@ namespace Framework.DungeonGeneratorSystem
 
             cellOut.Type = type;
             cellOut.Doors = doors;
-            cellOut.Renderer.color = colors[(int)type];
+            cellOut.Renderer.color = type.GetColor();
             _cells[pos] = cellOut;
             
             ShowCellDoors(cellOut);

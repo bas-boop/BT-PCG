@@ -16,7 +16,7 @@ namespace Framework.DungeonGeneratorSystem
             Doors = doors;
             Renderer = renderer;
 
-            DoorsObject = new Dictionary<Doors, GameObject>
+            DoorsObject = new ()
             {
                 { Doors.NORTH, renderer.transform.Find("DoorNorth").gameObject },
                 { Doors.EAST,  renderer.transform.Find("DoorEast").gameObject  },
