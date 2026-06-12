@@ -8,6 +8,7 @@
         END,
         NEGATIVE,
         POSITIVE,
-        SECRET
+        SECRET,
+        BOSS
     }
 }
