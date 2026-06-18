@@ -3,6 +3,8 @@
 namespace Framework.DungeonGeneratorSystem.Rules
 {
     [CreateAssetMenu(fileName = "NewDeadEndGenerationRule", menuName = "PCG/DeadEnd", order = 0)]
-    public class DeadEndGenerationRule : GenerationRule { }
-    // No extra fields needed — dead-end detection is purely door-count == 1
+    public class DeadEndGenerationRule : GenerationRule
+    {
+        public override bool TryPlace(Grid grid) => DoorCountGenerationRule.TryPlaceByDoorCount(grid, roomType, 1, 1);
+    }
 }

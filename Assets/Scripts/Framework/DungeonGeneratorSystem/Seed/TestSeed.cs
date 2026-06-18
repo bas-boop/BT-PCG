@@ -2,7 +2,7 @@
 
 using Framework.Extensions;
 
-namespace Framework.DungeonGeneratorSystem
+namespace Framework.DungeonGeneratorSystem.Seed
 {
     public class TestSeed : MonoBehaviour
     {
@@ -14,8 +14,6 @@ namespace Framework.DungeonGeneratorSystem
         [ContextMenu("Do random colors")]
         public void SetRandomColors()
         {
-            //RandomSeedSystem.SetSeed(seed);
-
             foreach (SpriteRenderer sprite in sprites)
             {
                 sprite.color = new (RandomSeedSystem.GetRandomFloat(), RandomSeedSystem.GetRandomFloat(), RandomSeedSystem.GetRandomFloat());

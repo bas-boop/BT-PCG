@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Framework.DungeonGeneratorSystem
+namespace Framework.DungeonGeneratorSystem.Seed
 {
     public static class RandomSeedSystem
     {

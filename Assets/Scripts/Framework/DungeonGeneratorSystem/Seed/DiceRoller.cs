@@ -1,6 +1,6 @@
 ﻿using Random = System.Random;
 
-namespace Framework.DungeonGeneratorSystem
+namespace Framework.DungeonGeneratorSystem.Seed
 {
     public static class DiceRoller
     {

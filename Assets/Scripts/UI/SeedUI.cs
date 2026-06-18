@@ -2,6 +2,7 @@
 using TMPro;
 
 using Framework.DungeonGeneratorSystem;
+using Framework.DungeonGeneratorSystem.Seed;
 
 namespace UI
 {

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 
 using Framework.DungeonGeneratorSystem.Rules;
-using Framework.Extensions;
-
-using CollectionExtensions = Framework.Extensions.CollectionExtensions;
+using Framework.DungeonGeneratorSystem.Seed;
 using Quaternion = UnityEngine.Quaternion;
 
 namespace Framework.DungeonGeneratorSystem
@@ -18,302 +14,76 @@ namespace Framework.DungeonGeneratorSystem
         [SerializeField] private Vector2Int size = Vector2Int.one * 20;
         [SerializeField] private int stepAmount = 5;
         [SerializeField] private GenerationRule[] generationRules;
-
-        private readonly Dictionary<Vector2Int, Cell> _cells = new();
-        private Vector2Int _currentPos;
+ 
+        private Grid _grid;
         private Vector2Int _startPos;
         private Vector2Int _endPos;
-
-        private IEnumerable<KeyValuePair<Vector2Int, Cell>> ActiveCells => _cells.Where(kvp => kvp.Value.Type != CellType.EMPTY);
-
+ 
         public void Generate()
         {
-            Setup();
-            RandomWalk();
-            
-            // fix the end position when also ends at start, example seed "0"
-            if (_endPos == _startPos)
-                FixEndPosition();
-
+            _grid = BuildGrid();
+            Walker carver = new(_grid, stepAmount);
+            Vector2Int randomStart = new(RandomSeedSystem.GetRandomInt(0, size.x), RandomSeedSystem.GetRandomInt(0, size.y));
+ 
+            carver.Walk(randomStart);
+ 
+            _startPos = carver.StartPos;
+            _endPos = carver.EndPos;
+ 
             ColorGrid();
-
+            ApplyGenerationRules();
+        }
+ 
+        private Grid BuildGrid()
+        {
+            for (int i = transform.childCount - 1; i >= 0; i--)
+                Destroy(transform.GetChild(i).gameObject);
+ 
+            Grid grid = new(size);
+ 
+            for (int x = 0; x < size.x; x++)
+            {
+                for (int y = 0; y < size.y; y++)
+                {
+                    Vector2Int pos = new(x, y);
+ 
+                    if (grid.Contains(pos))
+                        continue;
+ 
+                    SpriteRenderer sr = Instantiate(cell, (Vector3Int)pos, Quaternion.identity, transform);
+                    sr.gameObject.name = $"Cell {pos}";
+                    grid.Set(pos, new (CellType.EMPTY, 0, sr));
+                }
+            }
+ 
+            return grid;
+        }
+ 
+        private void ColorGrid()
+        {
+            List<Vector2Int> positions = _grid.AllCells.Select(kvp => kvp.Key).ToList();
+ 
+            foreach (Vector2Int pos in positions)
+            {
+                CellType type = pos == _startPos
+                    ? CellType.START
+                    : pos == _endPos
+                        ? CellType.END
+                        : _grid.Get(pos).Type;
+ 
+                _grid.SetCellType(pos, type, _grid.Get(pos).Doors);
+            }
+        }
+ 
+        private void ApplyGenerationRules()
+        {
             foreach (GenerationRule genRule in generationRules)
             {
                 for (int i = 0; i < genRule.amount; i++)
                 {
-                    switch (genRule)
-                    {
-                        case DistanceGenerationRule distanceRule:
-                            PlaceSpecialRoomByDistance(distanceRule);
-                            continue;
-                        case DeadEndGenerationRule deadEndRule:
-                            PlaceSpecialRoomAtDeadEnd(deadEndRule);
-                            continue;
-                        case DoorCountGenerationRule doorCountRule:
-                            PlaceSpecialRoomByDoorCount(doorCountRule);
-                            continue;
-                        default:
-                            PlaceSpecialRoomRandom(genRule.roomType);
-                            break;
-                    }
+                    genRule.TryPlace(_grid);
                 }
             }
-        }
-
-        private void Setup()
-        {
-            for (int i = transform.childCount - 1; i >= 0; i--)
-                Destroy(transform.GetChild(i).gameObject);
-
-            _cells.Clear();
-
-            _startPos.x = RandomSeedSystem.GetRandomInt(0, size.x);
-            _startPos.y = RandomSeedSystem.GetRandomInt(0, size.y);
-            _currentPos = _startPos;
-
-            BuildGrid();
-        }
-
-        private void BuildGrid()
-        {
-            for (int x = 0; x < size.x; x++)
-            {
-                for (int y = 0; y < size.y; y++)
-                {
-                    Vector2Int pos = new(x, y);
-
-                    if (_cells.ContainsKey(pos))
-                        continue;
-
-                    SpriteRenderer sr = Instantiate(cell, (Vector3Int)pos, Quaternion.identity, transform);
-                    sr.gameObject.name = $"Cell {pos}";
-                    _cells[pos] = new (CellType.EMPTY, 0, sr);
-                }
-            }
-        }
-
-        private void RandomWalk()
-        {
-            if (_cells[_currentPos].Type == CellType.EMPTY)
-                SetCellType(_currentPos, CellType.NORMAL);
-
-            for (int i = 0; i < stepAmount; i++)
-            {
-                Walk();
-
-                if (i == stepAmount - 1)
-                    _endPos = _currentPos;
-            }
-        }
-
-        private void Walk()
-        {
-            Vector2Int nextPos;
-            CardinalDirections r;
-
-            do {
-                r = EnumExtensions.GetRandomEnumValue<CardinalDirections>(RandomSeedSystem.GetRandom());
-                nextPos = _currentPos + r.GetVector2Int();
-            } while (nextPos.x < 0 || nextPos.x >= size.x || nextPos.y < 0 || nextPos.y >= size.y);
-
-            Vector2Int prevPos = _currentPos;
-            _currentPos = nextPos;
-
-            if (_cells[_currentPos].Type == CellType.EMPTY)
-                SetCellType(_currentPos, CellType.NORMAL);
-
-            AddDoor(prevPos, r.ToDoor());
-            AddDoor(_currentPos, r.ToOppositeDoor());
-        }
-
-        private void AddDoor(Vector2Int pos, Doors door)
-        {
-            Cell cellToAddDoor = _cells[pos];
-            cellToAddDoor.Doors |= door;
-            _cells[pos] = cellToAddDoor;
-        }
-
-        private void FixEndPosition()
-        {
-            List<KeyValuePair<Vector2Int, Cell>> active = ActiveCells.ToList();
-            
-            if (active.Count <= 0)
-                return;
-
-            KeyValuePair<Vector2Int, Cell> picked = CollectionExtensions.GetRandomItem(active, RandomSeedSystem.GetRandom());
-            _endPos = picked.Key;
-
-            if (_endPos == _startPos)
-                FixEndPosition();
-        }
-
-        private void ColorGrid()
-        {
-            foreach (Vector2Int pos in _cells.Keys.ToList())
-            {
-                CellType type = pos == _startPos
-                                ? CellType.START
-                                : pos == _endPos 
-                                    ? CellType.END
-                                    : _cells[pos].Type;
-
-                SetCellType(pos, type, _cells[pos].Doors);
-            }
-        }
-
-        private void PlaceSpecialRoomRandom(CellType roomType)
-        {
-            List<KeyValuePair<Vector2Int, Cell>> candidates = ActiveCells.Where(kvp => kvp.Value.Type == CellType.NORMAL).ToList();
-
-            while (true)
-            {
-                KeyValuePair<Vector2Int, Cell> picked = CollectionExtensions.GetRandomItem(candidates, RandomSeedSystem.GetRandom());
-
-                if (picked.Value.Type != CellType.NORMAL)
-                    continue;
-                
-                SetCellType(picked.Key, roomType);
-                break;
-            }
-        }
-
-        private void PlaceSpecialRoomAtDeadEnd(DeadEndGenerationRule targetGr)
-        {
-            List<KeyValuePair<Vector2Int, Cell>> candidates = new();
- 
-            foreach (KeyValuePair<Vector2Int, Cell> kvp in ActiveCells)
-            {
-                bool isNormal = kvp.Value.Type == CellType.NORMAL;
-                bool isDeadEnd = GetDoorCount(kvp.Value.Doors) == 1;
- 
-                if (isNormal
-                    && isDeadEnd)
-                    candidates.Add(kvp);
-            }
- 
-            if (candidates.Count == 0)
-                return;
- 
-            KeyValuePair<Vector2Int, Cell> picked = CollectionExtensions.GetRandomItem(candidates, RandomSeedSystem.GetRandom());
-            SetCellType(picked.Key, targetGr.roomType);
-        }
-
-        private void PlaceSpecialRoomByDoorCount(DoorCountGenerationRule targetGenerationRule)
-        {
-            int low = Mathf.Clamp(targetGenerationRule.minDoors, 1, 4);
-            int high = Mathf.Clamp(targetGenerationRule.maxDoors, low, 4);
-
-            List<KeyValuePair<Vector2Int, Cell>> candidates = ActiveCells.Where(kvp =>
-            {
-                if (kvp.Value.Type != CellType.NORMAL)
-                    return false;
-                
-                int count = GetDoorCount(kvp.Value.Doors);
-                return count >= low && count <= high;
-            }).ToList();
-
-            if (candidates.Count == 0)
-                return;
-
-            KeyValuePair<Vector2Int, Cell> picked = CollectionExtensions.GetRandomItem(candidates, RandomSeedSystem.GetRandom());
-            SetCellType(picked.Key, targetGenerationRule.roomType);
-        }
-
-        private void PlaceSpecialRoomByDistance(DistanceGenerationRule targetGenerationRule)
-        {
-            float bestDistance = targetGenerationRule.distance == Distances.CLOSE ? float.MaxValue : 0f;
-            Vector2Int bestPos = Vector2Int.zero;
-            Vector2Int distanceCheck = Vector2Int.zero;
-            bool found = false;
-
-            foreach (KeyValuePair<Vector2Int, Cell> kvp in _cells.Where(kvp => kvp.Value.Type == targetGenerationRule.otherRoomType))
-            {
-                distanceCheck = kvp.Key;
-                break;
-            }
-
-            foreach (KeyValuePair<Vector2Int, Cell> kvp in _cells)
-            {
-                if (kvp.Value.Type != CellType.NORMAL)
-                    continue;
-
-                float dist = Vector2Int.Distance(distanceCheck, kvp.Key);
-
-                switch (targetGenerationRule.distance)
-                {
-                    case Distances.CLOSE:
-                        if (dist > bestDistance)
-                            continue;
-                        break;
-                    case Distances.FAR:
-                        if (dist <= bestDistance)
-                            continue;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-                
-                bestDistance = dist;
-                bestPos = kvp.Key;
-                found = true;
-            }
-
-            if (found)
-                SetCellType(bestPos, targetGenerationRule.roomType);
-        }
-
-        private static int GetDoorCount(Doors doors)
-        {
-            return Enum.GetValues(typeof(Doors)).Cast<Doors>().Count(dir => doors.HasFlag(dir));
-        }
-
-        private void SetCellType(Vector2Int pos, CellType type)
-        {
-            if (!_cells.TryGetValue(pos, out Cell cellOut))
-                return;
-
-            cellOut.Type = type;
-            cellOut.Renderer.color = type.GetColor();
-            _cells[pos] = cellOut;
-            
-            ShowCellDoors(cellOut);
-        }
-        
-        private void SetCellType(Vector2Int pos, CellType type, Doors doors)
-        {
-            if (!_cells.TryGetValue(pos, out Cell cellOut))
-                return;
-
-            cellOut.Type = type;
-            cellOut.Doors = doors;
-            cellOut.Renderer.color = type.GetColor();
-            _cells[pos] = cellOut;
-            
-            ShowCellDoors(cellOut);
-        }
-
-        private void ShowCellDoors(Cell targetCell)
-        {
-            foreach (Doors dir in Enum.GetValues(typeof(Doors)))
-                targetCell.DoorsObject[dir].SetActive(targetCell.Doors.HasFlag(dir));
-        }
-        
-        private void LogGrid()
-        {
-            StringBuilder sb = new();
-
-            for (int x = 0; x < size.x; x++)
-            {
-                for (int y = 0; y < size.y; y++)
-                {
-                    Vector2Int pos = new(x, y);
-                    int val = _cells.TryGetValue(pos, out Cell c) ? (int)c.Type : 0;
-                    sb.Append(val).Append(' ');
-                }
-                sb.AppendLine();
-            }
-
-            Debug.Log(sb.ToString());
         }
     }
 }

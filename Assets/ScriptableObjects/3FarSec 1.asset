@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 87067e5771164ff9a10820e03ec9c543, type: 3}
-  m_Name: BossRoom
-  m_EditorClassIdentifier: Assembly-CSharp::Framework.DungeonGeneratorSystem.Rules.DoorCountGenerationRule
+  m_Script: {fileID: 11500000, guid: 3d91a3b5a1ca42a78dd6dd99fb69e64d, type: 3}
+  m_Name: 3FarSec 1
+  m_EditorClassIdentifier: Assembly-CSharp::Framework.DungeonGeneratorSystem.Rules.DistanceGenerationRule
   amount: 1
-  roomType: 7
-  minDoors: 4
-  maxDoors: 4
+  roomType: 6
+  otherRoomType: 6
+  distance: 1
