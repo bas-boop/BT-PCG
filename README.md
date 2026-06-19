@@ -181,13 +181,11 @@ classDiagram
             +GetRandomFloat() float
             +GetRandom() Random
         }
-
         class DiceRoller {
             <<static>>
             -Random _random
             +Roll(int count, int sides) int
         }
-
         class CardinalDirections {
             <<enumeration>>
             NORTH
@@ -195,33 +193,84 @@ classDiagram
             SOUTH
             WEST
         }
-
+        class CardinalHelper {
+            <<static>>
+            +ToDoor(CardinalDirections dir) Doors
+            +ToOppositeDoor(CardinalDirections dir) Doors
+        }
+        class Doors {
+            <<enumeration>>
+            <<Flags>>
+            NORTH
+            EAST
+            SOUTH
+            WEST
+        }
+        class CellType {
+            <<enumeration>>
+            EMPTY
+            NORMAL
+            START
+            END
+            NEGATIVE
+            POSTIVE
+            SECRET
+            BOSS
+        }
+        class Cell {
+            <<struct>>
+            +CellType Type
+            +Doors Doors
+            +SpriteRenderer Renderer
+            +Dictionary~Doors,GameObject~ DoorsObject
+            +Cell(CellType type, Doors doors, SpriteRenderer renderer)
+        }
+        class Grid {
+            -Dictionary~Vector2Int,Cell~ _cells
+            -Vector2Int _size
+            +Vector2Int Size
+            +Grid(Vector2Int size)
+            +AllCells IEnumerable
+            +ActiveCells IEnumerable
+            +Contains(Vector2Int pos) bool
+            +InBounds(Vector2Int pos) bool
+            +Get(Vector2Int pos) Cell
+            +TryGet(Vector2Int pos, out Cell cell) bool
+            +Set(Vector2Int pos, Cell cell)
+            +Clear()
+            +AddDoor(Vector2Int pos, Doors door)
+            +SetCellType(Vector2Int pos, CellType type)
+            +SetCellType(Vector2Int pos, CellType type, Doors doors)
+            +GetDoorCount(Doors doors) int$
+            -ShowCellDoors(Cell targetCell)$
+        }
+        class Walker {
+            -Grid _grid
+            -int _stepAmount
+            +Vector2Int StartPos
+            +Vector2Int EndPos
+            +Walker(Grid grid, int stepAmount)
+            +Walk(Vector2Int startPos)
+            -Step(Vector2Int currentPos) Vector2Int
+            -FixEndPosition()
+        }
         class Generator {
             <<MonoBehaviour>>
             -SpriteRenderer cell
             -Vector2Int size
             -int stepAmount
-            -int positiveRooms
-            -int negativeRooms
-            -int secretRooms
-            -int[,] _grid
-            -Dictionary _cells
-            -List _cellSprites
-            -Vector2Int _currentPos
+            -GenerationRule[] generationRules
+            -GenerationRule[] funkyGenerationRules
+            -Grid _grid
+            -GenerationRule[] _rules
             -Vector2Int _startPos
             -Vector2Int _endPos
             +Generate()
-            -RandomWalk()
-            -Setup()
-            -BuildGrid()
-            -Walk()
-            -FixEndPosition()
+            +ToggleFunkyMode()
+            -BuildGrid() Grid
             -ColorGrid()
-            -PlaceSpecialRoomRandom(Color roomColor)
-            -PlaceSpecialRoomByDistance(Color roomColor)
-            -LogGrid()
+            -ApplyGenerationRules()
         }
-
         class TestSeed {
             <<MonoBehaviour>>
             -string seed
@@ -231,14 +280,51 @@ classDiagram
             -Walk()
         }
     }
-
+    namespace Rules {
+        class GenerationRule {
+            <<ScriptableObject>>
+            +int amount
+            +CellType roomType
+            +TryPlace(Grid grid) bool
+        }
+        class DeadEndGenerationRule {
+            +TryPlace(Grid grid) bool
+        }
+        class DistanceGenerationRule {
+            +CellType otherRoomType
+            +Distances distance
+            +TryPlace(Grid grid) bool
+        }
+        class DoorCountGenerationRule {
+            +int minDoors
+            +int maxDoors
+            +TryPlace(Grid grid) bool
+            +TryPlaceByDoorCount(Grid grid, CellType roomType, int minDoors, int maxDoors) bool$
+        }
+        class ScatterGenerationRule {
+            +int scatterCount
+            +TryPlace(Grid grid) bool
+        }
+        class TeleportSwapGenerationRule {
+            +CellType otherRoomType
+            +TryPlace(Grid grid) bool
+        }
+        class WildcardGenerationRule {
+            +CellType[] possibleTypes
+            +TryPlace(Grid grid) bool
+        }
+        class Distances {
+            <<enumeration>>
+            CLOSE
+            FAR
+        }
+    }
     namespace Extensions {
         class CollectionExtensions {
             <<static>>
             +GetRandomItem~T~(IList~T~ list, Random r) T
             +GetRandomItem~T~(ICollection~T~ collection) T
         }
-
         class EnumExtensions {
             <<static>>
             +GetStringValue(Enum value) string
@@ -249,7 +335,6 @@ classDiagram
             +GetRandomEnumValue~T~(Random r) T
         }
     }
-
     namespace UI {
         class SeedUI {
             <<MonoBehaviour>>
@@ -261,13 +346,35 @@ classDiagram
         }
     }
 
-    Generator ..> RandomSeedSystem : uses
-    Generator ..> CollectionExtensions : uses
-    Generator ..> EnumExtensions : uses
+    GenerationRule <|-- DeadEndGenerationRule
+    GenerationRule <|-- DistanceGenerationRule
+    GenerationRule <|-- DoorCountGenerationRule
+    GenerationRule <|-- ScatterGenerationRule
+    GenerationRule <|-- TeleportSwapGenerationRule
+    GenerationRule <|-- WildcardGenerationRule
+    DeadEndGenerationRule ..> DoorCountGenerationRule : delegates to
+    DistanceGenerationRule ..> Distances : uses
+    GenerationRule ..> CollectionExtensions : uses
+    GenerationRule ..> RandomSeedSystem : uses
+
+    Generator "1" *-- "1" Grid : builds
+    Generator "1" *-- "1" Walker : carves with
+    Generator "1" o-- "*" GenerationRule : applies
+    Walker ..> Grid : modifies
+    Walker ..> CardinalDirections : steps with
+    Walker ..> CardinalHelper : uses
+    Walker ..> CollectionExtensions : uses
+    Walker ..> RandomSeedSystem : uses
+    Grid "1" o-- "*" Cell : contains
+    Grid ..> CellType : uses
+    Cell ..> Doors : has
+    Cell ..> CellType : has
+    CardinalHelper ..> CardinalDirections : extends
+    CardinalHelper ..> Doors : produces
+
     TestSeed ..> RandomSeedSystem : uses
     TestSeed ..> EnumExtensions : uses
     SeedUI ..> RandomSeedSystem : uses
     SeedUI ..> DiceRoller : uses
     EnumExtensions ..> CardinalDirections : reflects on
-    Generator ..> CardinalDirections : walks with
 ```
