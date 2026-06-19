@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -14,11 +15,15 @@ namespace Framework.DungeonGeneratorSystem
         [SerializeField] private Vector2Int size = Vector2Int.one * 20;
         [SerializeField] private int stepAmount = 5;
         [SerializeField] private GenerationRule[] generationRules;
- 
+        [SerializeField] private GenerationRule[] funkyGenerationRules;
+
         private Grid _grid;
+        private GenerationRule[] _rules;
         private Vector2Int _startPos;
         private Vector2Int _endPos;
- 
+
+        private void Start() => _rules = generationRules;
+
         public void Generate()
         {
             _grid = BuildGrid();
@@ -33,7 +38,9 @@ namespace Framework.DungeonGeneratorSystem
             ColorGrid();
             ApplyGenerationRules();
         }
- 
+
+        public void ToggleFunkyMode() => _rules = _rules == generationRules ? funkyGenerationRules : generationRules;
+
         private Grid BuildGrid()
         {
             for (int i = transform.childCount - 1; i >= 0; i--)
@@ -77,7 +84,7 @@ namespace Framework.DungeonGeneratorSystem
  
         private void ApplyGenerationRules()
         {
-            foreach (GenerationRule genRule in generationRules)
+            foreach (GenerationRule genRule in _rules)
             {
                 for (int i = 0; i < genRule.amount; i++)
                 {
